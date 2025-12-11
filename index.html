@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Periodic Table Generator</title>
+<style>
+    :root {
+        /* Default Font Sizes */
+        --fs-num: 0.6em;
+        --fs-sym: 1.5em;
+        --fs-name: 0.6em;
+        --fs-mass: 0.65em;
+        
+        /* Layout Variables */
+        --margin-tb: 20px;
+        --margin-lr: 20px;
+        --table-scale: 1;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: white;
+        margin: 0;
+        padding: var(--margin-tb) var(--margin-lr); /* Dynamic Margins */
+        text-align: center;
+        transition: padding 0.2s ease;
+        overflow-x: auto;
+    }
+
+    /* --- SETTINGS MENU --- */
+    #settings-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 50px;
+        cursor: pointer;
+        z-index: 1000;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    #settings-btn:hover { background: #555; }
+
+    #controls-panel {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        width: 300px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        z-index: 999;
+        text-align: left;
+        border: 1px solid #ddd;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    #controls-panel.open { display: block; }
+
+    .control-group { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+    .control-group:last-child { border-bottom: none; }
+    
+    .control-group label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #444;
+    }
+
+    input[type=range] { width: 100%; cursor: pointer; }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+    
+    button.action-btn {
+        flex: 1;
+        background-color: #007bff; color: white; border: none; padding: 10px;
+        border-radius: 4px; cursor: pointer; font-size: 14px;
+    }
+    button.reset { background-color: #6c757d; }
+    button.action-btn:hover { opacity: 0.9; }
+
+    /* --- TABLE STYLES --- */
+    .table-wrapper {
+        display: inline-block;
+        /* Scale the entire table container based on slider */
+        transform: scale(var(--table-scale)); 
+        transform-origin: top center;
+        width: 100%;
+    }
+
+    .periodic-table {
+        display: grid;
+        grid-template-columns: repeat(18, 1fr);
+        gap: 4px;
+        max-width: 1400px;
+        margin: 0 auto;
+        font-size: 1vw; /* Responsive base size */
+    }
+
+    .element {
+        aspect-ratio: 5/7;
+        border: 1px solid #333;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2px 4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Text Sizes */
+    .at-num { font-size: var(--fs-num); text-align: left; line-height: 1.1; }
+    .symbol { font-size: var(--fs-sym); font-weight: bold; line-height: 1; margin: 2px 0; }
+    .name { font-size: var(--fs-name); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; }
+    .mass { font-size: var(--fs-mass); line-height: 1.1; }
+
+    /* Group Colors */
+    .g1 { background-color: #ffcccc; }
+    .g2 { background-color: #ffdead; }
+    .tm { background-color: #ffffcc; }
+    .g13 { background-color: #ccffcc; }
+    .g14 { background-color: #ccffff; }
+    .g15 { background-color: #e6ccff; }
+    .g16 { background-color: #ffccff; }
+    .g17 { background-color: #ffccee; }
+    .g18 { background-color: #e6e6e6; }
+    .lan { background-color: #ffb3e6; }
+    .act { background-color: #ff99cc; }
+    .spacer { border: none; background: none; }
+    .f-block-spacer { grid-column: 1 / -1; height: 15px; border:none; background:none; }
+
+    /* --- PRINT STYLES --- */
+    @media print {
+        @page { size: landscape; margin: 0; } /* Remove browser default margins */
+        
+        body { 
+            background-color: white; 
+            /* Print uses the padding variables set by the user */
+            width: 100%;
+        }
+        
+        #settings-btn, #controls-panel { display: none !important; }
+        
+        .periodic-table { 
+            gap: 1px; 
+            font-size: 10pt; /* Baseline for print */
+        }
+        
+        .element { 
+            border: 1px solid black; 
+            break-inside: avoid; 
+            -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact; 
+        }
+
+        /* Ensure scale works in print */
+        .table-wrapper {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <button id="settings-btn" onclick="toggleMenu()">⚙ Options</button>
+
+    <div id="controls-panel">
+        <h3 style="margin-top:0">Table Settings</h3>
+
+        <div class="control-group">
+            <label>Rounding (Decimals): <span id="val-dec">1</span></label>
+            <input type="range" id="decimals" min="0" max="4" value="1" step="1" oninput="updateTableRender()">
+        </div>
+
+        <div class="control-group">
+            <label>Page Margins (Top/Bot)</label>
+            <input type="range" id="mtb" min="0" max="100" value="20" oninput="updateLayout()">
+            <label>Page Margins (Left/Right)</label>
+            <input type="range" id="mlr" min="0" max="100" value="20" oninput="updateLayout()">
+        </div>
+
+        <div class="control-group">
+            <label>Table Scale (Zoom)</label>
+            <input type="range" id="scale" min="0.5" max="1.2" value="1" step="0.01" oninput="updateLayout()">
+            <small style="color:#666; display:block; margin-top:2px;">Reduce this if table is cut off.</small>
+        </div>
+
+        <div class="control-group">
+            <label>Atomic Number Size</label>
+            <input type="range" id="rn" min="0.3" max="1.0" value="0.6" step="0.05" oninput="updateFonts()">
+            
+            <label>Symbol Size</label>
+            <input type="range" id="rs" min="0.8" max="3.0" value="1.5" step="0.1" oninput="updateFonts()">
+            
+            <label>Name Size</label>
+            <input type="range" id="rnm" min="0.3" max="1.0" value="0.6" step="0.05" oninput="updateFonts()">
+            
+            <label>Mass Size</label>
+            <input type="range" id="rm" min="0.3" max="1.0" value="0.65" step="0.05" oninput="updateFonts()">
+        </div>
+
+        <div class="btn-row">
+            <button class="action-btn reset" onclick="resetDefaults()">Reset</button>
+            <button class="action-btn" onclick="window.print()">Print</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <div class="periodic-table" id="table-container">
+            </div>
+    </div>
+
+<script>
+    // --- DATA ---
+    const elements = [
+        {n:1, s:"H", name:"Hydrogen", m:1.008, g:"g1"}, {n:0, s:"", m:0, g:"spacer", c:16}, {n:2, s:"He", name:"Helium", m:4.0026, g:"g18"},
+        {n:3, s:"Li", name:"Lithium", m:6.94, g:"g1"}, {n:4, s:"Be", name:"Beryllium", m:9.0122, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:5, s:"B", name:"Boron", m:10.81, g:"g13"}, {n:6, s:"C", name:"Carbon", m:12.011, g:"g14"}, {n:7, s:"N", name:"Nitrogen", m:14.007, g:"g15"}, {n:8, s:"O", name:"Oxygen", m:15.999, g:"g16"}, {n:9, s:"F", name:"Fluorine", m:18.998, g:"g17"}, {n:10, s:"Ne", name:"Neon", m:20.180, g:"g18"},
+        {n:11, s:"Na", name:"Sodium", m:22.990, g:"g1"}, {n:12, s:"Mg", name:"Magnesium", m:24.305, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:13, s:"Al", name:"Aluminum", m:26.982, g:"g13"}, {n:14, s:"Si", name:"Silicon", m:28.085, g:"g14"}, {n:15, s:"P", name:"Phosphorus", m:30.974, g:"g15"}, {n:16, s:"S", name:"Sulfur", m:32.06, g:"g16"}, {n:17, s:"Cl", name:"Chlorine", m:35.45, g:"g17"}, {n:18, s:"Ar", name:"Argon", m:39.948, g:"g18"},
+        {n:19, s:"K", name:"Potassium", m:39.098, g:"g1"}, {n:20, s:"Ca", name:"Calcium", m:40.078, g:"g2"}, {n:21, s:"Sc", name:"Scandium", m:44.956, g:"tm"}, {n:22, s:"Ti", name:"Titanium", m:47.867, g:"tm"}, {n:23, s:"V", name:"Vanadium", m:50.942, g:"tm"}, {n:24, s:"Cr", name:"Chromium", m:51.996, g:"tm"}, {n:25, s:"Mn", name:"Manganese", m:54.938, g:"tm"}, {n:26, s:"Fe", name:"Iron", m:55.845, g:"tm"}, {n:27, s:"Co", name:"Cobalt", m:58.933, g:"tm"}, {n:28, s:"Ni", name:"Nickel", m:58.693, g:"tm"}, {n:29, s:"Cu", name:"Copper", m:63.546, g:"tm"}, {n:30, s:"Zn", name:"Zinc", m:65.38, g:"tm"}, {n:31, s:"Ga", name:"Gallium", m:69.723, g:"g13"}, {n:32, s:"Ge", name:"Germanium", m:72.630, g:"g14"}, {n:33, s:"As", name:"Arsenic", m:74.922, g:"g15"}, {n:34, s:"Se", name:"Selenium", m:78.971, g:"g16"}, {n:35, s:"Br", name:"Bromine", m:79.904, g:"g17"}, {n:36, s:"Kr", name:"Krypton", m:83.798, g:"g18"},
+        {n:37, s:"Rb", name:"Rubidium", m:85.468, g:"g1"}, {n:38, s:"Sr", name:"Strontium", m:87.62, g:"g2"}, {n:39, s:"Y", name:"Yttrium", m:88.906, g:"tm"}, {n:40, s:"Zr", name:"Zirconium", m:91.224, g:"tm"}, {n:41, s:"Nb", name:"Niobium", m:92.906, g:"tm"}, {n:42, s:"Mo", name:"Molybdenum", m:95.95, g:"tm"}, {n:43, s:"Tc", name:"Technetium", m:98, g:"tm"}, {n:44, s:"Ru", name:"Ruthenium", m:101.07, g:"tm"}, {n:45, s:"Rh", name:"Rhodium", m:102.91, g:"tm"}, {n:46, s:"Pd", name:"Palladium", m:106.42, g:"tm"}, {n:47, s:"Ag", name:"Silver", m:107.87, g:"tm"}, {n:48, s:"Cd", name:"Cadmium", m:112.41, g:"tm"}, {n:49, s:"In", name:"Indium", m:114.82, g:"g13"}, {n:50, s:"Sn", name:"Tin", m:118.71, g:"g14"}, {n:51, s:"Sb", name:"Antimony", m:121.76, g:"g15"}, {n:52, s:"Te", name:"Tellurium", m:127.60, g:"g16"}, {n:53, s:"I", name:"Iodine", m:126.90, g:"g17"}, {n:54, s:"Xe", name:"Xenon", m:131.29, g:"g18"},
+        {n:55, s:"Cs", name:"Cesium", m:132.91, g:"g1"}, {n:56, s:"Ba", name:"Barium", m:137.33, g:"g2"}, {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La-Lu"}, {n:72, s:"Hf", name:"Hafnium", m:178.49, g:"tm"}, {n:73, s:"Ta", name:"Tantalum", m:180.95, g:"tm"}, {n:74, s:"W", name:"Tungsten", m:183.84, g:"tm"}, {n:75, s:"Re", name:"Rhenium", m:186.21, g:"tm"}, {n:76, s:"Os", name:"Osmium", m:190.23, g:"tm"}, {n:77, s:"Ir", name:"Iridium", m:192.22, g:"tm"}, {n:78, s:"Pt", name:"Platinum", m:195.08, g:"tm"}, {n:79, s:"Au", name:"Gold", m:196.97, g:"tm"}, {n:80, s:"Hg", name:"Mercury", m:200.59, g:"tm"}, {n:81, s:"Tl", name:"Thallium", m:204.38, g:"g13"}, {n:82, s:"Pb", name:"Lead", m:207.2, g:"g14"}, {n:83, s:"Bi", name:"Bismuth", m:208.98, g:"g15"}, {n:84, s:"Po", name:"Polonium", m:209, g:"g16"}, {n:85, s:"At", name:"Astatine", m:210, g:"g17"}, {n:86, s:"Rn", name:"Radon", m:222, g:"g18"},
+        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n:88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n:105, s:"Db", name:"Dubnium", m:268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n:108, s:"Hs", name:"Hassium", m:277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n:111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m:286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
+    ];
+
+    const lanthanides = [
+        {n:57, s:"La", name:"Lanthanum", m:138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m:150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m:157.25, g:"lan"}, {n:65, s:"Tb", name:"Terbium", m:158.93, g:"lan"}, {n:66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m:164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n:71, s:"Lu", name:"Lutetium", m:174.97, g:"lan"}
+    ];
+
+    const actinides = [
+        {n:89, s:"Ac", name:"Actinium", m:227, g:"act"}, {n:90, s:"Th", name:"Thorium", m:232.04, g:"act"}, {n:91, s:"Pa", name:"Protactinium", m:231.04, g:"act"}, {n:92, s:"U", name:"Uranium", m:238.03, g:"act"}, {n:93, s:"Np", name:"Neptunium", m:237, g:"act"}, {n:94, s:"Pu", name:"Plutonium", m:244, g:"act"}, {n:95, s:"Am", name:"Americium", m:243, g:"act"}, {n:96, s:"Cm", name:"Curium", m:247, g:"act"}, {n:97, s:"Bk", name:"Berkelium", m:247, g:"act"}, {n:98, s:"Cf", name:"Californium", m:251, g:"act"}, {n:99, s:"Es", name:"Einsteinium", m:252, g:"act"}, {n:100, s:"Fm", name:"Fermium", m:257, g:"act"}, {n:101, s:"Md", name:"Mendelevium", m:258, g:"act"}, {n:102, s:"No", name:"Nobelium", m:259, g:"act"}, {n:103, s:"Lr", name:"Lawrencium", m:266, g:"act"}
+    ];
+
+    // --- UI LOGIC ---
+    function toggleMenu() {
+        document.getElementById('controls-panel').classList.toggle('open');
+    }
+
+    function updateFonts() {
+        const root = document.documentElement;
+        root.style.setProperty('--fs-num', document.getElementById('rn').value + 'em');
+        root.style.setProperty('--fs-sym', document.getElementById('rs').value + 'em');
+        root.style.setProperty('--fs-name', document.getElementById('rnm').value + 'em');
+        root.style.setProperty('--fs-mass', document.getElementById('rm').value + 'em');
+    }
+
+    function updateLayout() {
+        const root = document.documentElement;
+        // Padding
+        const mtb = document.getElementById('mtb').value + 'px';
+        const mlr = document.getElementById('mlr').value + 'px';
+        root.style.setProperty('--margin-tb', mtb);
+        root.style.setProperty('--margin-lr', mlr);
+
+        // Scale
+        const scale = document.getElementById('scale').value;
+        root.style.setProperty('--table-scale', scale);
+    }
+
+    function resetDefaults() {
+        document.getElementById('rn').value = 0.6;
+        document.getElementById('rs').value = 1.5;
+        document.getElementById('rnm').value = 0.6;
+        document.getElementById('rm').value = 0.65;
+        document.getElementById('decimals').value = 1;
+        
+        document.getElementById('mtb').value = 20;
+        document.getElementById('mlr').value = 20;
+        document.getElementById('scale').value = 1;
+
+        updateFonts();
+        updateLayout();
+        updateTableRender();
+    }
+
+    function updateTableRender() {
+        const decimals = document.getElementById('decimals').value;
+        document.getElementById('val-dec').innerText = decimals;
+        renderTable(decimals);
+    }
+
+    function renderTable(decimals) {
+        const container = document.getElementById('table-container');
+        container.innerHTML = ""; 
+
+        const createEl = (data) => {
+            const div = document.createElement('div');
+            if (data.g === "spacer") {
+                div.className = "spacer";
+                div.style.gridColumn = `span ${data.c}`;
+                return div;
+            }
+
+            div.className = `element ${data.g || ''}`;
+            
+            // Handle ranges (like 57-71)
+            if(data.text) {
+                div.innerHTML = `<div class="at-num">${data.s}</div><div class="symbol" style="font-size:var(--fs-name); margin-top:5px;">${data.text}</div>`;
+                return div;
+            }
+
+            let massDisplay = "";
+            if (typeof data.m === "number") {
+                massDisplay = data.m.toFixed(decimals);
+            } else {
+                massDisplay = data.m; 
+            }
+
+            div.innerHTML = `
+                <div class="at-num">${data.n}</div>
+                <div class="symbol">${data.s}</div>
+                <div class="name">${data.name}</div>
+                <div class="mass">${massDisplay}</div>
+            `;
+            return div;
+        };
+
+        // Render Blocks
+        elements.forEach(el => container.appendChild(createEl(el)));
+
+        const spacerRow = document.createElement('div');
+        spacerRow.className = "f-block-spacer";
+        container.appendChild(spacerRow);
+
+        const lSpacer = document.createElement('div');
+        lSpacer.className = "spacer";
+        lSpacer.style.gridColumn = "span 3";
+        container.appendChild(lSpacer);
+        lanthanides.forEach(el => container.appendChild(createEl(el)));
+
+        const aSpacer = document.createElement('div');
+        aSpacer.className = "spacer";
+        aSpacer.style.gridColumn = "span 3";
+        container.appendChild(aSpacer);
+        actinides.forEach(el => container.appendChild(createEl(el)));
+    }
+
+    // Initial Render
+    renderTable(1);
+</script>
+</body>
+</html>
