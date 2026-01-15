@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pro Periodic Table Generator</title>
 <style>
-    : root {
+    :root {
         /* Default Font Sizes - Optimized for printing */
         --fs-num:  0.55em;
         --fs-sym: 1.3em;
@@ -16,6 +16,9 @@
         --margin-tb:  10px;
         --margin-lr: 8px;
         --table-scale: 0.78;
+        
+        /* Max name size for auto-fitting */
+        --max-name-size: 0.65em;
     }
 
     body {
@@ -125,11 +128,11 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    #preview-btn: hover { background: #0056b3; }
+    #preview-btn:hover { background: #0056b3; }
     body.preview-mode #preview-btn { background: #28a745; }
 
     @media print {
-        #settings-btn, #preview-btn { display: none !important; }
+        #settings-btn, #preview-btn { display: none ! important; }
     }
 
     #controls-panel {
@@ -137,7 +140,7 @@
         position: fixed;
         top: 70px;
         right: 20px;
-        width: 320px;
+        width: 340px;
         background: white;
         padding: 20px;
         border-radius: 8px;
@@ -149,14 +152,14 @@
         overflow-y:  auto;
     }
 
-    #controls-panel.open { display: block; }
+    #controls-panel. open { display: block; }
 
-    .control-group { 
+    . control-group { 
         margin-bottom: 15px; 
         border-bottom: 1px solid #eee; 
         padding-bottom: 10px; 
     }
-    .control-group:last-child { border-bottom: none; }
+    . control-group: last-child { border-bottom:  none; }
     
     .control-group label {
         display: flex;
@@ -167,7 +170,7 @@
         color: #444;
     }
 
-    . control-group . value-display {
+    .control-group . value-display {
         color: #007bff;
         font-weight: normal;
     }
@@ -178,9 +181,21 @@
         margin-bottom: 3px;
     }
 
-    . btn-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    input[type=checkbox] {
+        cursor: pointer;
+        margin-right: 8px;
+    }
+
+    . checkbox-label {
+        display: flex ! important;
+        align-items:  center;
+        font-weight: normal ! important;
+        cursor: pointer;
+    }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
     
-    button.action-btn {
+    button. action-btn {
         flex: 1;
         background-color: #007bff; 
         color: white; 
@@ -195,7 +210,7 @@
     button.fit { background-color: #28a745; }
     button.action-btn:hover { opacity: 0.9; }
 
-    . help-text {
+    .help-text {
         font-size: 0.75rem;
         color: #666;
         margin-top: 3px;
@@ -215,13 +230,13 @@
         display: grid;
         grid-template-columns: repeat(18, 1fr);
         gap: 3px;
-        max-width:  1600px; /* Increased from 1400px */
+        max-width: 1600px;
         margin: 0 auto;
-        font-size: 11pt; /* Fixed size for better control */
+        font-size: 11pt;
     }
 
-    .element {
-        aspect-ratio: 5/6; /* Slightly taller boxes (was 5/7) */
+    . element {
+        aspect-ratio: 5/6;
         border: 1px solid #333;
         background: white;
         display: flex;
@@ -238,27 +253,31 @@
         font-size: var(--fs-num); 
         text-align: left; 
         line-height: 1.1; 
-        font-weight:  500;
+        font-weight: 500;
     }
     
     .symbol { 
         font-size: var(--fs-sym); 
         font-weight: bold; 
         line-height: 1; 
-        margin: auto 0;
+        margin:  auto 0;
         text-align: center;
     }
     
     .name { 
-        font-size: var(--fs-name); 
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
         line-height: 1.1;
         text-align: center;
         font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    
+
+    /* Auto-fitting name sizes - applied via inline styles in JS */
+    .name. auto-fit {
+        /* Size set dynamically by JS */
+    }
+
     .mass { 
         font-size: var(--fs-mass); 
         line-height: 1.1;
@@ -274,16 +293,16 @@
     .g14 { background-color: #ccffff; }
     .g15 { background-color: #e6ccff; }
     .g16 { background-color: #ffccff; }
-    . g17 { background-color:  #ffccee; }
+    .g17 { background-color: #ffccee; }
     .g18 { background-color: #e6e6e6; }
-    .lan { background-color: #ffb3e6; }
+    . lan { background-color: #ffb3e6; }
     .act { background-color: #ff99cc; }
-    .spacer { border: none; background: none; }
+    .spacer { border:  none; background: none; }
     .f-block-spacer { 
         grid-column: 1 / -1; 
         height: 8px; 
-        border:  none; 
-        background: none; 
+        border: none; 
+        background:  none; 
     }
 
     /* --- PRINT STYLES --- */
@@ -298,24 +317,29 @@
             padding: var(--margin-tb) var(--margin-lr) !important;
         }
         
+        body.preview-mode {
+            background-color: white !important;
+            padding: var(--margin-tb) var(--margin-lr) !important;
+        }
+
+        body.preview-mode .page-preview {
+            width: 100% !important;
+            height:  100% !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
         #settings-btn, #controls-panel, #preview-btn { 
             display: none !important; 
         }
 
-        .page-preview {
-            box-shadow: none !important;
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
-        }
-
-        .margin-guide {
+        . margin-guide {
             display: none !important;
         }
         
         .periodic-table { 
-            gap: 2px;
+            gap: 3px;
             font-size: 11pt;
             page-break-inside: avoid;
         }
@@ -324,13 +348,12 @@
             border: 1px solid #000;
             break-inside: avoid;
             page-break-inside: avoid;
-            /* CRITICAL: Force colors and text to print */
-            -webkit-print-color-adjust:  exact ! important;
+            -webkit-print-color-adjust: exact ! important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
         }
 
-        /* CRITICAL: Ensure all text elements print */
+        /* CRITICAL:  Ensure all text elements print with exact same styling */
         .at-num, .symbol, .name, .mass {
             display: block !important;
             visibility: visible !important;
@@ -338,7 +361,13 @@
             color: #000 !important;
         }
 
-        . table-wrapper {
+        .name {
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: clip !important;
+        }
+
+        .table-wrapper {
             transform: scale(var(--table-scale)) !important;
             page-break-inside: avoid;
         }
@@ -380,10 +409,22 @@
             <label>Symbol Size: <span class="value-display" id="val-rs">1.30</span></label>
             <input type="range" id="rs" min="0.8" max="3.0" value="1.3" step="0.05" oninput="updateFonts()">
             
-            <label>Name Size: <span class="value-display" id="val-rnm">0.58</span></label>
+            <label class="checkbox-label" style="margin-top:  10px; margin-bottom: 10px;">
+                <input type="checkbox" id="autofit" checked onchange="updateTableRender()">
+                <span>Auto-fit Element Names (Smart Sizing)</span>
+            </label>
+            <div class="help-text" style="margin-top: -5px; margin-bottom: 10px;">
+                ✨ Makes each name as large as possible without clipping
+            </div>
+            
+            <label>Name Size (when auto-fit off): <span class="value-display" id="val-rnm">0.58</span></label>
             <input type="range" id="rnm" min="0.3" max="1.0" value="0.58" step="0.05" oninput="updateFonts()">
             
-            <label>Mass Size: <span class="value-display" id="val-rm">0.60</span></label>
+            <label>Max Name Size (auto-fit limit): <span class="value-display" id="val-maxname">0.65</span></label>
+            <input type="range" id="maxname" min="0.4" max="1.2" value="0.65" step="0.05" oninput="updateMaxNameSize()">
+            <div class="help-text">Maximum size for auto-fitted names</div>
+            
+            <label>Mass Size:  <span class="value-display" id="val-rm">0.60</span></label>
             <input type="range" id="rm" min="0.3" max="1.0" value="0.60" step="0.05" oninput="updateFonts()">
         </div>
 
@@ -399,8 +440,9 @@
         <div class="help-text" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px; border-left: 3px solid #007bff;">
             <strong>Quick Start:</strong><br>
             1. Click "Preview Print" to see layout<br>
-            2. Adjust settings as needed<br>
-            3. Click "Print" when ready
+            2. Auto-fit ensures perfect name sizing<br>
+            3. Adjust other settings as needed<br>
+            4. Click "Print" when ready
         </div>
     </div>
 
@@ -419,21 +461,38 @@
     // --- DATA ---
     const elements = [
         {n: 1, s:"H", name:"Hydrogen", m:1.008, g:"g1"}, {n:0, s:"", m:0, g:"spacer", c: 16}, {n:2, s:"He", name:"Helium", m:4.0026, g:"g18"},
-        {n:3, s:"Li", name:"Lithium", m:6.94, g:"g1"}, {n:4, s:"Be", name:"Beryllium", m: 9.0122, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:5, s:"B", name:"Boron", m:10.81, g:"g13"}, {n:6, s:"C", name:"Carbon", m:12.011, g:"g14"}, {n:7, s:"N", name:"Nitrogen", m:14.007, g:"g15"}, {n:8, s:"O", name:"Oxygen", m:15.999, g:"g16"}, {n:9, s:"F", name:"Fluorine", m:18.998, g:"g17"}, {n:10, s:"Ne", name:"Neon", m:20.180, g:"g18"},
+        {n:3, s:"Li", name:"Lithium", m:6.94, g:"g1"}, {n:4, s:"Be", name:"Beryllium", m:9.0122, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:5, s:"B", name:"Boron", m:10.81, g:"g13"}, {n:6, s:"C", name:"Carbon", m:12.011, g:"g14"}, {n:7, s:"N", name:"Nitrogen", m:14.007, g:"g15"}, {n:8, s:"O", name:"Oxygen", m:15.999, g:"g16"}, {n:9, s:"F", name:"Fluorine", m:18.998, g:"g17"}, {n:10, s:"Ne", name:"Neon", m:20.180, g:"g18"},
         {n:11, s:"Na", name:"Sodium", m:22.990, g:"g1"}, {n:12, s:"Mg", name:"Magnesium", m:24.305, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:13, s:"Al", name:"Aluminum", m:26.982, g:"g13"}, {n:14, s:"Si", name:"Silicon", m:28.085, g:"g14"}, {n:15, s:"P", name:"Phosphorus", m:30.974, g:"g15"}, {n:16, s:"S", name:"Sulfur", m: 32.06, g:"g16"}, {n:17, s:"Cl", name:"Chlorine", m:35.45, g:"g17"}, {n:18, s:"Ar", name:"Argon", m:39.948, g:"g18"},
-        {n:19, s:"K", name:"Potassium", m:39.098, g:"g1"}, {n:20, s:"Ca", name:"Calcium", m:40.078, g:"g2"}, {n:21, s:"Sc", name:"Scandium", m:44.956, g:"tm"}, {n:22, s:"Ti", name:"Titanium", m:47.867, g:"tm"}, {n:23, s:"V", name:"Vanadium", m:50.942, g:"tm"}, {n: 24, s:"Cr", name:"Chromium", m:51.996, g:"tm"}, {n:25, s:"Mn", name:"Manganese", m:54.938, g:"tm"}, {n:26, s:"Fe", name:"Iron", m:55.845, g:"tm"}, {n:27, s:"Co", name:"Cobalt", m:58.933, g:"tm"}, {n: 28, s:"Ni", name:"Nickel", m:58.693, g:"tm"}, {n:29, s:"Cu", name:"Copper", m:63.546, g:"tm"}, {n:30, s:"Zn", name:"Zinc", m:65.38, g:"tm"}, {n:31, s:"Ga", name:"Gallium", m:69.723, g:"g13"}, {n:32, s:"Ge", name:"Germanium", m:72.630, g:"g14"}, {n:33, s:"As", name:"Arsenic", m: 74.922, g:"g15"}, {n:34, s:"Se", name:"Selenium", m:78.971, g:"g16"}, {n:35, s:"Br", name:"Bromine", m:79.904, g:"g17"}, {n:36, s:"Kr", name:"Krypton", m:83.798, g:"g18"},
-        {n: 37, s:"Rb", name:"Rubidium", m: 85.468, g:"g1"}, {n:38, s:"Sr", name:"Strontium", m:87.62, g:"g2"}, {n:39, s:"Y", name:"Yttrium", m:88.906, g:"tm"}, {n:40, s:"Zr", name:"Zirconium", m:91.224, g:"tm"}, {n:41, s:"Nb", name:"Niobium", m:92.906, g:"tm"}, {n:42, s:"Mo", name:"Molybdenum", m:95.95, g:"tm"}, {n:43, s:"Tc", name:"Technetium", m:98, g:"tm"}, {n: 44, s:"Ru", name:"Ruthenium", m: 101.07, g:"tm"}, {n:45, s:"Rh", name:"Rhodium", m:102.91, g:"tm"}, {n: 46, s:"Pd", name:"Palladium", m: 106.42, g:"tm"}, {n:47, s:"Ag", name:"Silver", m:107.87, g:"tm"}, {n:48, s:"Cd", name:"Cadmium", m:112.41, g:"tm"}, {n:49, s:"In", name:"Indium", m:114.82, g:"g13"}, {n:50, s:"Sn", name:"Tin", m:118.71, g:"g14"}, {n: 51, s:"Sb", name:"Antimony", m:121.76, g:"g15"}, {n:52, s:"Te", name:"Tellurium", m:127.60, g:"g16"}, {n:53, s:"I", name:"Iodine", m:126.90, g:"g17"}, {n:54, s:"Xe", name:"Xenon", m:131.29, g:"g18"},
-        {n:55, s:"Cs", name:"Cesium", m:132.91, g:"g1"}, {n:56, s:"Ba", name:"Barium", m: 137.33, g:"g2"}, {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La-Lu"}, {n:72, s:"Hf", name:"Hafnium", m: 178.49, g:"tm"}, {n:73, s:"Ta", name:"Tantalum", m:180.95, g:"tm"}, {n: 74, s:"W", name:"Tungsten", m:183.84, g:"tm"}, {n:75, s:"Re", name:"Rhenium", m:186.21, g:"tm"}, {n:76, s:"Os", name:"Osmium", m:190.23, g:"tm"}, {n:77, s:"Ir", name:"Iridium", m:192.22, g:"tm"}, {n:78, s:"Pt", name:"Platinum", m:195.08, g:"tm"}, {n:79, s:"Au", name:"Gold", m:196.97, g:"tm"}, {n:80, s:"Hg", name:"Mercury", m:200.59, g:"tm"}, {n:81, s:"Tl", name:"Thallium", m: 204.38, g:"g13"}, {n:82, s:"Pb", name:"Lead", m:207.2, g:"g14"}, {n:83, s:"Bi", name:"Bismuth", m:208.98, g:"g15"}, {n:84, s:"Po", name:"Polonium", m:209, g:"g16"}, {n:85, s:"At", name:"Astatine", m:210, g:"g17"}, {n:86, s:"Rn", name:"Radon", m:222, g:"g18"},
-        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n:88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n: 105, s:"Db", name:"Dubnium", m: 268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n:108, s:"Hs", name:"Hassium", m:277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n: 111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m:286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
+        {n:19, s:"K", name:"Potassium", m:39.098, g:"g1"}, {n:20, s:"Ca", name:"Calcium", m: 40.078, g:"g2"}, {n:21, s:"Sc", name:"Scandium", m:44.956, g:"tm"}, {n:22, s:"Ti", name:"Titanium", m:47.867, g:"tm"}, {n:23, s:"V", name:"Vanadium", m:50.942, g:"tm"}, {n: 24, s:"Cr", name:"Chromium", m:51.996, g:"tm"}, {n:25, s:"Mn", name:"Manganese", m:54.938, g:"tm"}, {n:26, s:"Fe", name:"Iron", m:55.845, g:"tm"}, {n:27, s:"Co", name:"Cobalt", m:58.933, g:"tm"}, {n: 28, s:"Ni", name:"Nickel", m:58.693, g:"tm"}, {n:29, s:"Cu", name:"Copper", m:63.546, g:"tm"}, {n:30, s:"Zn", name:"Zinc", m:65.38, g:"tm"}, {n:31, s:"Ga", name:"Gallium", m: 69.723, g:"g13"}, {n:32, s:"Ge", name:"Germanium", m:72.630, g:"g14"}, {n:33, s:"As", name:"Arsenic", m:74.922, g:"g15"}, {n:34, s:"Se", name:"Selenium", m:78.971, g:"g16"}, {n:35, s:"Br", name:"Bromine", m:79.904, g:"g17"}, {n:36, s:"Kr", name:"Krypton", m:83.798, g:"g18"},
+        {n:37, s:"Rb", name:"Rubidium", m:85.468, g:"g1"}, {n:38, s:"Sr", name:"Strontium", m:87.62, g:"g2"}, {n:39, s:"Y", name:"Yttrium", m:88.906, g:"tm"}, {n:40, s:"Zr", name:"Zirconium", m:91.224, g:"tm"}, {n:41, s:"Nb", name:"Niobium", m:92.906, g:"tm"}, {n:42, s:"Mo", name:"Molybdenum", m:95.95, g:"tm"}, {n:43, s:"Tc", name:"Technetium", m:98, g:"tm"}, {n: 44, s:"Ru", name:"Ruthenium", m: 101.07, g:"tm"}, {n:45, s:"Rh", name:"Rhodium", m:102.91, g:"tm"}, {n:46, s:"Pd", name:"Palladium", m:106.42, g:"tm"}, {n:47, s:"Ag", name:"Silver", m:107.87, g:"tm"}, {n:48, s:"Cd", name:"Cadmium", m:112.41, g:"tm"}, {n:49, s:"In", name:"Indium", m:114.82, g:"g13"}, {n:50, s:"Sn", name:"Tin", m: 118.71, g:"g14"}, {n:51, s:"Sb", name:"Antimony", m:121.76, g:"g15"}, {n:52, s:"Te", name:"Tellurium", m:127.60, g:"g16"}, {n:53, s:"I", name:"Iodine", m:126.90, g:"g17"}, {n:54, s:"Xe", name:"Xenon", m:131.29, g:"g18"},
+        {n:55, s:"Cs", name:"Cesium", m:132.91, g:"g1"}, {n:56, s:"Ba", name:"Barium", m:137.33, g:"g2"}, {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La-Lu"}, {n:72, s:"Hf", name:"Hafnium", m: 178.49, g:"tm"}, {n:73, s:"Ta", name:"Tantalum", m:180.95, g:"tm"}, {n: 74, s:"W", name:"Tungsten", m:183.84, g:"tm"}, {n:75, s:"Re", name:"Rhenium", m:186.21, g:"tm"}, {n:76, s:"Os", name:"Osmium", m:190.23, g:"tm"}, {n:77, s:"Ir", name:"Iridium", m:192.22, g:"tm"}, {n:78, s:"Pt", name:"Platinum", m:195.08, g:"tm"}, {n:79, s:"Au", name:"Gold", m:196.97, g:"tm"}, {n:80, s:"Hg", name:"Mercury", m:200.59, g:"tm"}, {n:81, s:"Tl", name:"Thallium", m:204.38, g:"g13"}, {n:82, s:"Pb", name:"Lead", m:207.2, g:"g14"}, {n:83, s:"Bi", name:"Bismuth", m:208.98, g:"g15"}, {n:84, s:"Po", name:"Polonium", m:209, g:"g16"}, {n:85, s:"At", name:"Astatine", m:210, g:"g17"}, {n:86, s:"Rn", name:"Radon", m:222, g:"g18"},
+        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n: 88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n:105, s:"Db", name:"Dubnium", m:268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n:108, s:"Hs", name:"Hassium", m:277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n: 111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m: 286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
     ];
 
     const lanthanides = [
-        {n:57, s:"La", name:"Lanthanum", m:138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m: 150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m:157.25, g:"lan"}, {n: 65, s:"Tb", name:"Terbium", m: 158.93, g:"lan"}, {n:66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m: 164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n:71, s:"Lu", name:"Lutetium", m: 174.97, g:"lan"}
+        {n:57, s:"La", name:"Lanthanum", m: 138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m: 150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m: 157.25, g:"lan"}, {n:65, s:"Tb", name:"Terbium", m:158.93, g:"lan"}, {n: 66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m:164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n: 71, s:"Lu", name:"Lutetium", m:174.97, g:"lan"}
     ];
 
     const actinides = [
-        {n: 89, s:"Ac", name:"Actinium", m:227, g:"act"}, {n: 90, s:"Th", name:"Thorium", m:232.04, g:"act"}, {n:91, s:"Pa", name:"Protactinium", m:231.04, g:"act"}, {n:92, s:"U", name:"Uranium", m:238.03, g:"act"}, {n:93, s:"Np", name:"Neptunium", m:237, g:"act"}, {n:94, s:"Pu", name:"Plutonium", m:244, g:"act"}, {n: 95, s:"Am", name:"Americium", m:243, g:"act"}, {n: 96, s:"Cm", name:"Curium", m:247, g:"act"}, {n:97, s:"Bk", name:"Berkelium", m:247, g:"act"}, {n:98, s:"Cf", name:"Californium", m:251, g:"act"}, {n:99, s:"Es", name:"Einsteinium", m:252, g:"act"}, {n:100, s:"Fm", name:"Fermium", m:257, g:"act"}, {n: 101, s:"Md", name:"Mendelevium", m:258, g:"act"}, {n:102, s:"No", name:"Nobelium", m:259, g:"act"}, {n:103, s:"Lr", name:"Lawrencium", m:266, g:"act"}
+        {n: 89, s:"Ac", name:"Actinium", m:227, g:"act"}, {n:90, s:"Th", name:"Thorium", m: 232.04, g:"act"}, {n:91, s:"Pa", name:"Protactinium", m: 231.04, g:"act"}, {n:92, s:"U", name:"Uranium", m:238.03, g:"act"}, {n:93, s:"Np", name:"Neptunium", m:237, g:"act"}, {n:94, s:"Pu", name:"Plutonium", m: 244, g:"act"}, {n: 95, s:"Am", name:"Americium", m:243, g:"act"}, {n: 96, s:"Cm", name:"Curium", m:247, g:"act"}, {n:97, s:"Bk", name:"Berkelium", m:247, g:"act"}, {n:98, s:"Cf", name:"Californium", m:251, g:"act"}, {n:99, s:"Es", name:"Einsteinium", m:252, g:"act"}, {n:100, s:"Fm", name:"Fermium", m:257, g:"act"}, {n:101, s:"Md", name:"Mendelevium", m:258, g:"act"}, {n:102, s:"No", name:"Nobelium", m:259, g:"act"}, {n:103, s:"Lr", name:"Lawrencium", m: 266, g:"act"}
     ];
+
+    // Calculate appropriate font size based on name length
+    function calculateNameSize(name, maxSize) {
+        const baseLength = 6; // Short names like "Helium" get max size
+        const length = name.length;
+        
+        if (length <= baseLength) {
+            return maxSize;
+        }
+        
+        // Scale down for longer names
+        // Praseodymium (13 chars), Rutherfordium (13), Protactinium (13)
+        const scaleFactor = baseLength / length;
+        const minSize = 0.35; // Minimum readable size
+        
+        return Math.max(minSize, maxSize * scaleFactor);
+    }
 
     // --- UI LOGIC ---
     function toggleMenu() {
@@ -466,6 +525,15 @@
         document.getElementById('val-rs').textContent = parseFloat(rs).toFixed(2);
         document.getElementById('val-rnm').textContent = parseFloat(rnm).toFixed(2);
         document.getElementById('val-rm').textContent = parseFloat(rm).toFixed(2);
+
+        updateTableRender();
+    }
+
+    function updateMaxNameSize() {
+        const maxName = document.getElementById('maxname').value;
+        document.getElementById('val-maxname').textContent = parseFloat(maxName).toFixed(2);
+        document. documentElement.style.setProperty('--max-name-size', maxName + 'em');
+        updateTableRender();
     }
 
     function updateLayout() {
@@ -489,17 +557,21 @@
         document.getElementById('rs').value = 1.3;
         document.getElementById('rnm').value = 0.58;
         document.getElementById('rm').value = 0.60;
+        document.getElementById('maxname').value = 0.65;
         
         document.getElementById('mtb').value = 10;
         document.getElementById('mlr').value = 8;
         document.getElementById('scale').value = 0.78;
 
+        document.getElementById('autofit').checked = true;
+
         updateFonts();
         updateLayout();
+        updateMaxNameSize();
     }
 
     function resetDefaults() {
-        fitToPage(); // Use the same optimized defaults
+        fitToPage();
         document.getElementById('decimals').value = 1;
         updateTableRender();
     }
@@ -513,6 +585,10 @@
     function renderTable(decimals) {
         const container = document.getElementById('table-container');
         container.innerHTML = ""; 
+
+        const autoFit = document.getElementById('autofit').checked;
+        const maxNameSize = parseFloat(document.getElementById('maxname').value);
+        const fixedNameSize = parseFloat(document.getElementById('rnm').value);
 
         const createEl = (data) => {
             const div = document.createElement('div');
@@ -537,10 +613,19 @@
                 massDisplay = data.m; 
             }
 
+            // Calculate name size if auto-fit is enabled
+            let nameStyle = '';
+            if (autoFit && data.name) {
+                const calculatedSize = calculateNameSize(data.name, maxNameSize);
+                nameStyle = `style="font-size:  ${calculatedSize}em;"`;
+            } else {
+                nameStyle = `style="font-size: ${fixedNameSize}em;"`;
+            }
+
             div.innerHTML = `
                 <div class="at-num">${data.n}</div>
                 <div class="symbol">${data.s}</div>
-                <div class="name">${data.name}</div>
+                <div class="name" ${nameStyle}>${data. name}</div>
                 <div class="mass">${massDisplay}</div>
             `;
             return div;
@@ -558,7 +643,7 @@
         const lSpacer = document.createElement('div');
         lSpacer.className = "spacer";
         lSpacer.style.gridColumn = "span 3";
-        container.appendChild(lSpacer);
+        container. appendChild(lSpacer);
         lanthanides.forEach(el => container.appendChild(createEl(el)));
 
         // Actinides
