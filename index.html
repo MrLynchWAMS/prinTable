@@ -1,22 +1,22 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pro Periodic Table Generator</title>
 <style>
-    : root {
-        /* Default Font Sizes - LARGER for better visibility */
+    :root {
+        /* Default Font Sizes - Larger for readability */
         --fs-num: 0.70em;
-        --fs-sym:  1.8em;
+        --fs-sym: 1.8em;
         --fs-name: 0.75em;
         --fs-mass: 0.75em;
-        
-        /* Layout Variables - Print-optimized defaults */
+
+        /* Layout Variables - print-optimized defaults */
         --margin-tb: 8px;
         --margin-lr: 8px;
-        --table-scale: 0.92;
-        
+        --table-scale: 0.88; /* slightly smaller so it fits at 100% print zoom */
+
         /* Max name size for auto-fitting */
         --max-name-size: 0.85em;
     }
@@ -33,7 +33,7 @@
 
     /* Print Preview Mode */
     body.preview-mode {
-        background:  #444;
+        background: #444;
         padding: 20px;
     }
 
@@ -42,9 +42,8 @@
         margin: 0 auto;
         box-shadow: 0 0 20px rgba(0,0,0,0.5);
         padding: var(--margin-tb) var(--margin-lr);
-        /* Standard landscape letter size at 96 DPI */
-        width: 1056px;  /* 11 inches */
-        height: 816px;  /* 8.5 inches */
+        width: 1056px; /* 11 in @96dpi */
+        height: 816px; /* 8.5 in @96dpi */
         overflow: hidden;
         position: relative;
     }
@@ -55,8 +54,7 @@
         pointer-events: none;
         z-index: 10;
     }
-
-    body. preview-mode .margin-guide. top { 
+    body.preview-mode .margin-guide.top { 
         top: 0; left: 0; right: 0; 
         height: var(--margin-tb);
         border-bottom: 2px dashed #ff6b6b;
@@ -64,7 +62,6 @@
         border-left: none;
         border-right: none;
     }
-
     body.preview-mode .margin-guide.bottom { 
         bottom: 0; left: 0; right: 0; 
         height: var(--margin-tb);
@@ -73,7 +70,6 @@
         border-left: none;
         border-right: none;
     }
-
     body.preview-mode .margin-guide.left { 
         top: 0; left: 0; bottom: 0; 
         width: var(--margin-lr);
@@ -82,67 +78,57 @@
         border-top: none;
         border-bottom: none;
     }
-
     body.preview-mode .margin-guide.right { 
         top: 0; right: 0; bottom: 0; 
         width: var(--margin-lr);
-        border-left:  2px dashed #ff6b6b;
+        border-left: 2px dashed #ff6b6b;
         border-right: none;
         border-top: none;
         border-bottom: none;
     }
 
-    /* --- CONTROL BUTTONS (Bottom Right, doesn't cover table) --- */
+    /* --- CONTROL BUTTONS (Bottom Left, off the table) --- */
     #button-container {
         position: fixed;
         bottom: 20px;
-        right: 20px;
+        left: 20px;
         z-index: 1000;
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    . control-btn {
+    .control-btn {
         background: #333;
         color: white;
-        border: none;
+        border: 1px solid #0004;
         padding: 12px 18px;
-        border-radius: 50px;
+        border-radius: 10px;
         cursor: pointer;
         font-size: 16px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
         transition: all 0.2s ease;
         white-space: nowrap;
+        backdrop-filter: blur(4px);
     }
-    
     .control-btn:hover { 
         background: #555; 
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.35);
     }
 
     #preview-btn {
         background: #007bff;
     }
-
-    #preview-btn:hover { 
-        background: #0056b3; 
-    }
-    
-    body.preview-mode #preview-btn { 
-        background: #28a745; 
-    }
-
-    body. preview-mode #preview-btn: hover { 
-        background: #1e7e34; 
-    }
+    #preview-btn:hover { background: #0056b3; }
+    body.preview-mode #preview-btn { background: #28a745; }
+    body.preview-mode #preview-btn:hover { background: #1e7e34; }
 
     @media print {
-        #button-container { display: none ! important; }
+        #button-container { display: none !important; }
     }
 
     /* --- SETTINGS PANEL --- */
@@ -155,36 +141,30 @@
         background: white;
         padding: 20px;
         border-radius: 8px;
-        box-shadow:  0 10px 25px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         z-index: 999;
         text-align: left;
         border: 1px solid #ddd;
         max-height: 85vh;
-        overflow-y:  auto;
+        overflow-y: auto;
     }
 
-    #controls-panel. open { 
+    #controls-panel.open { 
         display: block; 
         animation: slideIn 0.3s ease;
     }
 
     @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform:  translateX(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        from { opacity: 0; transform: translateX(20px); }
+        to   { opacity: 1; transform: translateX(0); }
     }
 
-    . control-group { 
+    .control-group { 
         margin-bottom: 15px; 
         border-bottom: 1px solid #eee; 
         padding-bottom: 10px; 
     }
-    . control-group: last-child { border-bottom: none; }
+    .control-group:last-child { border-bottom: none; }
     
     .control-group label {
         display: flex;
@@ -195,7 +175,7 @@
         color: #444;
     }
 
-    .control-group . value-display {
+    .value-display {
         color: #007bff;
         font-weight: normal;
     }
@@ -211,16 +191,16 @@
         margin-right: 8px;
     }
 
-    . checkbox-label {
-        display: flex ! important;
-        align-items:  center;
-        font-weight: normal ! important;
+    .checkbox-label {
+        display: flex !important;
+        align-items: center;
+        font-weight: normal !important;
         cursor: pointer;
     }
 
     .btn-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
     
-    button. action-btn {
+    button.action-btn {
         flex: 1;
         background-color: #007bff; 
         color: white; 
@@ -260,13 +240,10 @@
         align-items: center;
         justify-content: center;
     }
-
-    #close-panel: hover {
-        background: #c82333;
-    }
+    #close-panel:hover { background: #c82333; }
 
     /* --- TABLE STYLES --- */
-    . table-wrapper {
+    .table-wrapper {
         display: inline-block;
         transform: scale(var(--table-scale)); 
         transform-origin: top center;
@@ -305,10 +282,10 @@
     }
     
     .symbol { 
-        font-size:  var(--fs-sym); 
+        font-size: var(--fs-sym); 
         font-weight: bold; 
         line-height: 1; 
-        margin:  auto 0;
+        margin: auto 0;
         text-align: center;
     }
     
@@ -317,7 +294,7 @@
         text-align: center;
         font-weight: 500;
         white-space: nowrap;
-        overflow: visible; /* Changed from hidden */
+        overflow: visible;
         text-overflow: clip;
     }
 
@@ -340,12 +317,12 @@
     .g18 { background-color: #e6e6e6; }
     .lan { background-color: #ffb3e6; }
     .act { background-color: #ff99cc; }
-    .spacer { border:  none; background: none; }
+    .spacer { border: none; background: none; }
     .f-block-spacer { 
         grid-column: 1 / -1; 
         height: 8px; 
         border: none; 
-        background:  none; 
+        background: none; 
     }
 
     /* --- PRINT STYLES --- */
@@ -356,7 +333,7 @@
         }
         
         body { 
-            background-color: white ! important;
+            background-color: white !important;
             padding: var(--margin-tb) var(--margin-lr) !important;
         }
         
@@ -391,13 +368,12 @@
             border: 1px solid #000;
             break-inside: avoid;
             page-break-inside: avoid;
-            -webkit-print-color-adjust: exact ! important;
+            -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
-            overflow: visible ! important;
+            overflow: visible !important;
         }
 
-        /* CRITICAL:  Ensure all text elements print */
         .at-num, .symbol, .name, .mass {
             display: block !important;
             visibility: visible !important;
@@ -408,7 +384,7 @@
 
         .name {
             white-space: nowrap !important;
-            overflow:  visible !important;
+            overflow: visible !important;
             text-overflow: clip !important;
         }
 
@@ -421,7 +397,7 @@
 </head>
 <body>
 
-    <!-- Control Buttons (Bottom Right) -->
+    <!-- Control Buttons (Bottom Left) -->
     <div id="button-container">
         <button class="control-btn" id="preview-btn" onclick="togglePreview()">
             <span>👁</span>
@@ -453,9 +429,9 @@
         </div>
 
         <div class="control-group">
-            <label>Table Scale (Zoom): <span class="value-display" id="val-scale">92%</span></label>
-            <input type="range" id="scale" min="0.5" max="1.2" value="0.92" step="0.01" oninput="updateLayout()">
-            <div class="help-text">Reduce if table is cut off when printing</div>
+            <label>Table Scale (Zoom): <span class="value-display" id="val-scale">88%</span></label>
+            <input type="range" id="scale" min="0.5" max="1.2" value="0.88" step="0.01" oninput="updateLayout()">
+            <div class="help-text">Should fit on landscape at 100% print zoom</div>
         </div>
 
         <div class="control-group">
@@ -496,9 +472,9 @@
         <div class="help-text" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px; border-left: 3px solid #007bff;">
             <strong>Quick Start:</strong><br>
             1. Click "Preview Print" to see layout<br>
-            2. Auto-fit ensures perfect name sizing<br>
-            3. Adjust other settings as needed<br>
-            4. Click "Print" button or press Ctrl+P
+            2. Auto-fit keeps names large and unclipped<br>
+            3. Table Scale is set to fit at 100% print zoom<br>
+            4. Click Print or press Ctrl+P
         </div>
     </div>
 
@@ -522,11 +498,11 @@
         {n:19, s:"K", name:"Potassium", m:39.098, g:"g1"}, {n:20, s:"Ca", name:"Calcium", m:40.078, g:"g2"}, {n:21, s:"Sc", name:"Scandium", m: 44.956, g:"tm"}, {n:22, s:"Ti", name:"Titanium", m:47.867, g:"tm"}, {n:23, s:"V", name:"Vanadium", m:50.942, g:"tm"}, {n: 24, s:"Cr", name:"Chromium", m:51.996, g:"tm"}, {n:25, s:"Mn", name:"Manganese", m:54.938, g:"tm"}, {n:26, s:"Fe", name:"Iron", m:55.845, g:"tm"}, {n:27, s:"Co", name:"Cobalt", m:58.933, g:"tm"}, {n: 28, s:"Ni", name:"Nickel", m:58.693, g:"tm"}, {n:29, s:"Cu", name:"Copper", m:63.546, g:"tm"}, {n:30, s:"Zn", name:"Zinc", m:65.38, g:"tm"}, {n:31, s:"Ga", name:"Gallium", m: 69.723, g:"g13"}, {n:32, s:"Ge", name:"Germanium", m:72.630, g:"g14"}, {n:33, s:"As", name:"Arsenic", m: 74.922, g:"g15"}, {n:34, s:"Se", name:"Selenium", m:78.971, g:"g16"}, {n:35, s:"Br", name:"Bromine", m:79.904, g:"g17"}, {n: 36, s:"Kr", name:"Krypton", m:83.798, g:"g18"},
         {n:37, s:"Rb", name:"Rubidium", m:85.468, g:"g1"}, {n:38, s:"Sr", name:"Strontium", m:87.62, g:"g2"}, {n:39, s:"Y", name:"Yttrium", m:88.906, g:"tm"}, {n:40, s:"Zr", name:"Zirconium", m:91.224, g:"tm"}, {n:41, s:"Nb", name:"Niobium", m:92.906, g:"tm"}, {n:42, s:"Mo", name:"Molybdenum", m:95.95, g:"tm"}, {n:43, s:"Tc", name:"Technetium", m:98, g:"tm"}, {n: 44, s:"Ru", name:"Ruthenium", m: 101.07, g:"tm"}, {n:45, s:"Rh", name:"Rhodium", m:102.91, g:"tm"}, {n: 46, s:"Pd", name:"Palladium", m: 106.42, g:"tm"}, {n:47, s:"Ag", name:"Silver", m:107.87, g:"tm"}, {n:48, s:"Cd", name:"Cadmium", m:112.41, g:"tm"}, {n:49, s:"In", name:"Indium", m:114.82, g:"g13"}, {n:50, s:"Sn", name:"Tin", m:118.71, g:"g14"}, {n: 51, s:"Sb", name:"Antimony", m:121.76, g:"g15"}, {n:52, s:"Te", name:"Tellurium", m:127.60, g:"g16"}, {n: 53, s:"I", name:"Iodine", m:126.90, g:"g17"}, {n:54, s:"Xe", name:"Xenon", m:131.29, g:"g18"},
         {n:55, s:"Cs", name:"Cesium", m:132.91, g:"g1"}, {n:56, s:"Ba", name:"Barium", m: 137.33, g:"g2"}, {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La-Lu"}, {n:72, s:"Hf", name:"Hafnium", m:178.49, g:"tm"}, {n:73, s:"Ta", name:"Tantalum", m:180.95, g:"tm"}, {n:74, s:"W", name:"Tungsten", m:183.84, g:"tm"}, {n:75, s:"Re", name:"Rhenium", m: 186.21, g:"tm"}, {n:76, s:"Os", name:"Osmium", m:190.23, g:"tm"}, {n:77, s:"Ir", name:"Iridium", m:192.22, g:"tm"}, {n:78, s:"Pt", name:"Platinum", m: 195.08, g:"tm"}, {n:79, s:"Au", name:"Gold", m: 196.97, g:"tm"}, {n:80, s:"Hg", name:"Mercury", m:200.59, g:"tm"}, {n:81, s:"Tl", name:"Thallium", m:204.38, g:"g13"}, {n:82, s:"Pb", name:"Lead", m:207.2, g:"g14"}, {n: 83, s:"Bi", name:"Bismuth", m:208.98, g:"g15"}, {n:84, s:"Po", name:"Polonium", m:209, g:"g16"}, {n:85, s:"At", name:"Astatine", m:210, g:"g17"}, {n:86, s:"Rn", name:"Radon", m:222, g:"g18"},
-        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n:88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n:105, s:"Db", name:"Dubnium", m:268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n: 108, s:"Hs", name:"Hassium", m: 277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n: 111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m: 286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
+        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n:88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n:105, s:"Db", name:"Dubnium", m:268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n:108, s:"Hs", name:"Hassium", m:277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n:111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m: 286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
     ];
 
     const lanthanides = [
-        {n:57, s:"La", name:"Lanthanum", m: 138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m: 150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m:157.25, g:"lan"}, {n:65, s:"Tb", name:"Terbium", m:158.93, g:"lan"}, {n:66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m:164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n:71, s:"Lu", name:"Lutetium", m: 174.97, g:"lan"}
+        {n:57, s:"La", name:"Lanthanum", m: 138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m: 150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m: 157.25, g:"lan"}, {n:65, s:"Tb", name:"Terbium", m:158.93, g:"lan"}, {n: 66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m:164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n:71, s:"Lu", name:"Lutetium", m: 174.97, g:"lan"}
     ];
 
     const actinides = [
@@ -537,15 +513,9 @@
     function calculateNameSize(name, maxSize) {
         const baseLength = 6; // Short names like "Helium" get max size
         const length = name.length;
-        
-        if (length <= baseLength) {
-            return maxSize;
-        }
-        
-        // Scale down for longer names
+        if (length <= baseLength) return maxSize;
         const scaleFactor = baseLength / length;
         const minSize = 0.40; // Minimum readable size
-        
         return Math.max(minSize, maxSize * scaleFactor);
     }
 
@@ -558,11 +528,7 @@
     function togglePreview() {
         document.body.classList.toggle('preview-mode');
         const textSpan = document.getElementById('preview-text');
-        if(document.body.classList.contains('preview-mode')) {
-            textSpan.textContent = 'Preview On';
-        } else {
-            textSpan.textContent = 'Preview Print';
-        }
+        textSpan.textContent = document.body.classList.contains('preview-mode') ? 'Preview On' : 'Preview Print';
     }
 
     function updateFonts() {
@@ -588,7 +554,7 @@
     function updateMaxNameSize() {
         const maxName = document.getElementById('maxname').value;
         document.getElementById('val-maxname').textContent = parseFloat(maxName).toFixed(2);
-        document. documentElement.style.setProperty('--max-name-size', maxName + 'em');
+        document.documentElement.style.setProperty('--max-name-size', maxName + 'em');
         updateTableRender();
     }
 
@@ -603,7 +569,7 @@
         root.style.setProperty('--table-scale', scale);
 
         document.getElementById('val-mtb').textContent = mtb + 'px';
-        document. getElementById('val-mlr').textContent = mlr + 'px';
+        document.getElementById('val-mlr').textContent = mlr + 'px';
         document.getElementById('val-scale').textContent = Math.round(scale * 100) + '%';
     }
 
@@ -613,11 +579,9 @@
         document.getElementById('rnm').value = 0.75;
         document.getElementById('rm').value = 0.75;
         document.getElementById('maxname').value = 0.85;
-        
         document.getElementById('mtb').value = 8;
         document.getElementById('mlr').value = 8;
-        document.getElementById('scale').value = 0.92;
-
+        document.getElementById('scale').value = 0.88;
         document.getElementById('autofit').checked = true;
 
         updateFonts();
