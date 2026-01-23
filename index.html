@@ -253,7 +253,7 @@
 
     .periodic-table {
         display: grid;
-        grid-template-columns: repeat(18, 1fr);
+        grid-template-columns: repeat(19, 1fr);
         gap: 3px;
         max-width: 1600px;
         margin: 0 auto;
@@ -318,6 +318,19 @@
     .lan { background-color: #ffb3e6; }
     .act { background-color: #ff99cc; }
     .spacer { border: none; background: none; }
+    
+    /* Period and Group number cells */
+    .period-number, .group-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9em;
+        color: #333;
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+    }
+    
     .f-block-spacer { 
         grid-column: 1 / -1; 
         height: 8px; 
@@ -416,7 +429,7 @@
 
         <div class="control-group">
             <label>Rounding (Decimals): <span class="value-display" id="val-dec">1</span></label>
-            <input type="range" id="decimals" min="0" max="4" value="1" step="1" oninput="updateTableRender()">
+            <input type="range" id="decimals" min="0" max="5" value="1" step="1" oninput="updateTableRender()">
         </div>
 
         <div class="control-group">
@@ -609,6 +622,22 @@
         const maxNameSize = parseFloat(document.getElementById('maxname').value);
         const fixedNameSize = parseFloat(document.getElementById('rnm').value);
 
+        // Helper to create group number cells
+        const createGroupNumber = (num) => {
+            const div = document.createElement('div');
+            div.className = 'group-number';
+            div.textContent = num;
+            return div;
+        };
+
+        // Helper to create period number cells
+        const createPeriodNumber = (num) => {
+            const div = document.createElement('div');
+            div.className = 'period-number';
+            div.textContent = num;
+            return div;
+        };
+
         const createEl = (data) => {
             const div = document.createElement('div');
             if (data.g === "spacer") {
@@ -650,22 +679,62 @@
             return div;
         };
 
-        // Render main table
-        elements.forEach(el => container.appendChild(createEl(el)));
+        // === HEADER ROW: Empty corner + Groups 1-18 ===
+        const emptyCorner = document.createElement('div');
+        emptyCorner.className = 'spacer';
+        container.appendChild(emptyCorner);
+        for (let i = 1; i <= 18; i++) {
+            container.appendChild(createGroupNumber(i));
+        }
 
-        // Spacer between main table and f-block
+        // === MAIN TABLE: Track grid columns to know when to insert period numbers ===
+        let currentPeriod = 1;
+        let columnsInCurrentRow = 0;
+        
+        // Add period 1 number at start
+        container.appendChild(createPeriodNumber(currentPeriod));
+        
+        elements.forEach(el => {
+            // Check if we need to start a new row
+            if (columnsInCurrentRow >= 18) {
+                currentPeriod++;
+                container.appendChild(createPeriodNumber(currentPeriod));
+                columnsInCurrentRow = 0;
+            }
+            
+            // Create and add the element
+            const elementDiv = createEl(el);
+            container.appendChild(elementDiv);
+            
+            // Track columns (spacers span multiple columns)
+            if (el.g === "spacer") {
+                columnsInCurrentRow += el.c;
+            } else {
+                columnsInCurrentRow += 1;
+            }
+        });
+
+        // === F-BLOCK SPACER ROW ===
         const spacerRow = document.createElement('div');
         spacerRow.className = "f-block-spacer";
         container.appendChild(spacerRow);
 
-        // Lanthanides
+        // === LANTHANIDES: Empty period cell + 3-column spacer + 15 elements ===
+        const lPeriodSpacer = document.createElement('div');
+        lPeriodSpacer.className = "spacer";
+        container.appendChild(lPeriodSpacer);
+        
         const lSpacer = document.createElement('div');
         lSpacer.className = "spacer";
         lSpacer.style.gridColumn = "span 3";
         container.appendChild(lSpacer);
         lanthanides.forEach(el => container.appendChild(createEl(el)));
 
-        // Actinides
+        // === ACTINIDES: Empty period cell + 3-column spacer + 15 elements ===
+        const aPeriodSpacer = document.createElement('div');
+        aPeriodSpacer.className = "spacer";
+        container.appendChild(aPeriodSpacer);
+        
         const aSpacer = document.createElement('div');
         aSpacer.className = "spacer";
         aSpacer.style.gridColumn = "span 3";
