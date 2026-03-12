@@ -15,7 +15,7 @@
         /* Layout Variables - print-optimized defaults */
         --margin-tb: 8px;
         --margin-lr: 8px;
-        --table-scale: 0.88; /* slightly smaller so it fits at 100% print zoom */
+        --table-scale: 0.91; /* 0.91 = 100% — prints perfectly at landscape 100% */
         --table-offset-x: 0px;
         --table-offset-y: 0px;
 
@@ -60,33 +60,25 @@
         top: 0; left: 0; right: 0; 
         height: var(--margin-tb);
         border-bottom: 2px dashed #ff6b6b;
-        border-top: none;
-        border-left: none;
-        border-right: none;
+        border-top: none; border-left: none; border-right: none;
     }
     body.preview-mode .margin-guide.bottom { 
         bottom: 0; left: 0; right: 0; 
         height: var(--margin-tb);
         border-top: 2px dashed #ff6b6b;
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
+        border-bottom: none; border-left: none; border-right: none;
     }
     body.preview-mode .margin-guide.left { 
         top: 0; left: 0; bottom: 0; 
         width: var(--margin-lr);
         border-right: 2px dashed #ff6b6b;
-        border-left: none;
-        border-top: none;
-        border-bottom: none;
+        border-left: none; border-top: none; border-bottom: none;
     }
     body.preview-mode .margin-guide.right { 
         top: 0; right: 0; bottom: 0; 
         width: var(--margin-lr);
         border-left: 2px dashed #ff6b6b;
-        border-right: none;
-        border-top: none;
-        border-bottom: none;
+        border-right: none; border-top: none; border-bottom: none;
     }
 
     /* --- CONTROL BUTTONS (Bottom Left, off the table) --- */
@@ -122,9 +114,7 @@
         box-shadow: 0 4px 15px rgba(0,0,0,0.35);
     }
 
-    #preview-btn {
-        background: #007bff;
-    }
+    #preview-btn { background: #007bff; }
     #preview-btn:hover { background: #0056b3; }
     body.preview-mode #preview-btn { background: #28a745; }
     body.preview-mode #preview-btn:hover { background: #1e7e34; }
@@ -307,20 +297,129 @@
         font-weight: 400;
     }
 
-    /* Group Colors */
-    .g1 { background-color: #ffcccc; }
-    .g2 { background-color: #ffdead; }
-    .tm { background-color: #ffffcc; }
-    .g13 { background-color: #ccffcc; }
-    .g14 { background-color: #ccffff; }
-    .g15 { background-color: #e6ccff; }
-    .g16 { background-color: #ffccff; }
-    .g17 { background-color: #ffccee; }
-    .g18 { background-color: #e6e6e6; }
-    .lan { background-color: #ffb3e6; }
-    .act { background-color: #ff99cc; }
-    .spacer { border: none; background: none; }
-    
+    /* Electron configuration line */
+    .econfig {
+        display: none;
+        font-size: 0.55em;
+        line-height: 1.1;
+        text-align: center;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Electronegativity corner badge */
+    .eneg {
+        display: none;
+        position: absolute;
+        top: 2px;
+        right: 3px;
+        font-size: 0.52em;
+        color: #555;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    /* ---- CATEGORY COLORS & PATTERNS ---- */
+    /* Colors */
+    .cat-alkali    { background-color: #ffcccc; }
+    .cat-alkaline  { background-color: #ffdead; }
+    .cat-tm        { background-color: #ffffcc; }
+    .cat-ptm       { background-color: #ccffcc; }
+    .cat-metalloid { background-color: #ccffff; }
+    .cat-nonmetal  { background-color: #e6ccff; }
+    .cat-noble     { background-color: #e6e6e6; }
+    .cat-lan       { background-color: #ffb3e6; }
+    .cat-act       { background-color: #ff99cc; }
+
+    /* B&W Patterns (shown when .show-patterns is on the table container) */
+    /* Alkali Metal: diagonal lines / */
+    .show-patterns .cat-alkali {
+        background-image: repeating-linear-gradient(
+            45deg, transparent, transparent 3px,
+            rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
+        );
+    }
+    /* Alkaline Earth: diagonal lines \ */
+    .show-patterns .cat-alkaline {
+        background-image: repeating-linear-gradient(
+            -45deg, transparent, transparent 3px,
+            rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
+        );
+    }
+    /* Transition Metal: crosshatch */
+    .show-patterns .cat-tm {
+        background-image:
+            repeating-linear-gradient(45deg, transparent, transparent 4px,
+                rgba(0,0,0,0.07) 4px, rgba(0,0,0,0.07) 5px),
+            repeating-linear-gradient(-45deg, transparent, transparent 4px,
+                rgba(0,0,0,0.07) 4px, rgba(0,0,0,0.07) 5px);
+    }
+    /* Post-Transition Metal: horizontal stripes */
+    .show-patterns .cat-ptm {
+        background-image: repeating-linear-gradient(
+            0deg, transparent, transparent 3px,
+            rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
+        );
+    }
+    /* Metalloid: vertical stripes */
+    .show-patterns .cat-metalloid {
+        background-image: repeating-linear-gradient(
+            90deg, transparent, transparent 3px,
+            rgba(0,0,0,0.10) 3px, rgba(0,0,0,0.10) 4px
+        );
+    }
+    /* Reactive Nonmetal: dots */
+    .show-patterns .cat-nonmetal {
+        background-image: radial-gradient(
+            circle, rgba(0,0,0,0.15) 1px, transparent 1px
+        );
+        background-size: 5px 5px;
+    }
+    /* Noble Gas: grid (fine horizontal + vertical) */
+    .show-patterns .cat-noble {
+        background-image:
+            repeating-linear-gradient(0deg, transparent, transparent 4px,
+                rgba(0,0,0,0.08) 4px, rgba(0,0,0,0.08) 5px),
+            repeating-linear-gradient(90deg, transparent, transparent 4px,
+                rgba(0,0,0,0.08) 4px, rgba(0,0,0,0.08) 5px);
+    }
+    /* Lanthanide: wider horizontal stripes */
+    .show-patterns .cat-lan {
+        background-image: repeating-linear-gradient(
+            0deg, transparent, transparent 5px,
+            rgba(0,0,0,0.08) 5px, rgba(0,0,0,0.08) 6px
+        );
+    }
+    /* Actinide: wider crosshatch */
+    .show-patterns .cat-act {
+        background-image:
+            repeating-linear-gradient(0deg, transparent, transparent 3px,
+                rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px),
+            repeating-linear-gradient(90deg, transparent, transparent 6px,
+                rgba(0,0,0,0.08) 6px, rgba(0,0,0,0.08) 7px);
+    }
+
+    /* ---- STATE OF MATTER STYLES ---- */
+    /* Gas: blue symbol */
+    .show-state .element[data-state="gas"] .symbol    { color: #0055bb; }
+    /* Liquid: underlined symbol */
+    .show-state .element[data-state="liquid"] .symbol  { text-decoration: underline double 2px; }
+    /* Synthetic/unknown: gray italic */
+    .show-state .element[data-state="synthetic"] .symbol { color: #888; font-style: italic; }
+    /* Solid: default (black) — no override needed */
+
+    /* ---- DISPLAY TOGGLES ---- */
+    /* Show econfig when class is on container */
+    .show-econfig .econfig { display: block; }
+    /* Show eneg when class is on container */
+    .show-eneg .eneg { display: block; }
+    /* Hide names */
+    .hide-names .name { display: none !important; }
+    /* Hide mass */
+    .hide-mass .mass  { display: none !important; }
+
     /* Period and Group number cells */
     .period-number, .group-number {
         display: flex;
@@ -333,12 +432,67 @@
         border: 1px solid #ccc;
     }
     
+    .spacer { border: none; background: none; }
+
     .f-block-spacer { 
         grid-column: 1 / -1; 
         height: 8px; 
         border: none; 
         background: none; 
     }
+
+    /* ---- LEGEND ---- */
+    .legend-container {
+        margin-top: 6px;
+        border: 1px solid #bbb;
+        padding: 6px 8px;
+        background: #fafafa;
+        text-align: left;
+        font-size: 0.78em;
+    }
+
+    .hide-legend .legend-container { display: none; }
+
+    .legend-title {
+        font-weight: bold;
+        font-size: 1.05em;
+        margin-bottom: 4px;
+        color: #333;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 2px;
+    }
+
+    .legend-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 14px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+    }
+
+    .legend-swatch {
+        width: 22px;
+        height: 16px;
+        border: 1px solid #666;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    .legend-sections {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .legend-section { flex: 1; min-width: 200px; }
+
+    .legend-state-item { display: inline-flex; align-items: center; gap: 5px; margin-right: 12px; }
+    .legend-state-sym  { font-weight: bold; font-size: 1.1em; min-width: 16px; }
 
     /* --- PRINT STYLES --- */
     @media print {
@@ -369,9 +523,7 @@
             display: none !important; 
         }
 
-        .margin-guide {
-            display: none !important;
-        }
+        .margin-guide { display: none !important; }
         
         .periodic-table { 
             gap: 3px;
@@ -389,11 +541,10 @@
             overflow: visible !important;
         }
 
-        .at-num, .symbol, .name, .mass {
+        .at-num, .symbol, .name, .mass, .econfig {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
-            color: #000 !important;
             overflow: visible !important;
         }
 
@@ -403,10 +554,36 @@
             text-overflow: clip !important;
         }
 
+        /* Preserve state colors in print */
+        .show-state .element[data-state="gas"] .symbol    { color: #0055bb !important; }
+        .show-state .element[data-state="liquid"] .symbol  { text-decoration: underline double 2px !important; }
+        .show-state .element[data-state="synthetic"] .symbol { color: #888 !important; font-style: italic !important; }
+
         .table-wrapper {
             transform: scale(var(--table-scale)) translateX(var(--table-offset-x)) translateY(var(--table-offset-y)) !important;
             transform-origin: top left !important;
             page-break-inside: avoid;
+        }
+
+        .legend-container {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .show-patterns .cat-alkali,
+        .show-patterns .cat-alkaline,
+        .show-patterns .cat-tm,
+        .show-patterns .cat-ptm,
+        .show-patterns .cat-metalloid,
+        .show-patterns .cat-noble,
+        .show-patterns .cat-lan,
+        .show-patterns .cat-act {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        .show-patterns .cat-nonmetal {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
     }
 </style>
@@ -416,19 +593,19 @@
     <!-- Control Buttons (Bottom Left) -->
     <div id="button-container">
         <button class="control-btn" id="preview-btn" onclick="togglePreview()">
-            <span>👁</span>
+            <span>&#128065;</span>
             <span id="preview-text">Preview Print</span>
         </button>
         <button class="control-btn" id="settings-btn" onclick="toggleMenu()">
-            <span>⚙</span>
+            <span>&#9881;</span>
             <span>Options</span>
         </button>
     </div>
 
     <!-- Settings Panel -->
     <div id="controls-panel">
-        <button id="close-panel" onclick="toggleMenu()" title="Close settings">✕</button>
-        <h3 style="margin-top: 0; color: #333;">⚙ Table Settings</h3>
+        <button id="close-panel" onclick="toggleMenu()" title="Close settings">&#x2715;</button>
+        <h3 style="margin-top: 0; color: #333;">&#9881; Table Settings</h3>
 
         <div class="control-group">
             <label>Rounding (Decimals): <span class="value-display" id="val-dec">1</span></label>
@@ -441,13 +618,13 @@
             
             <label>Page Margins (Left/Right): <span class="value-display" id="val-mlr">8px</span></label>
             <input type="range" id="mlr" min="0" max="50" value="8" oninput="updateLayout()">
-            <div class="help-text">💡 Use Print Preview to see margin guides</div>
+            <div class="help-text">&#128161; Use Print Preview to see margin guides</div>
         </div>
 
         <div class="control-group">
-            <label>Table Scale (Zoom): <span class="value-display" id="val-scale">88%</span></label>
-            <input type="range" id="scale" min="0.5" max="1.2" value="0.88" step="0.01" oninput="updateLayout()">
-            <div class="help-text">Should fit on landscape at 100% print zoom</div>
+            <label>Table Scale (Zoom): <span class="value-display" id="val-scale">100%</span></label>
+            <input type="range" id="scale" min="0.5" max="1.2" value="0.91" step="0.01" oninput="updateLayout()">
+            <div class="help-text">100% = 0.91 raw scale — prints perfectly at landscape 100%</div>
         </div>
 
         <div class="control-group">
@@ -456,7 +633,7 @@
             
             <label>Vertical Position: <span class="value-display" id="val-offsety">0px</span></label>
             <input type="range" id="offsety" min="-100" max="100" value="0" step="1" oninput="updateLayout()">
-            <div class="help-text">↔↕ Slide to position the table on the printed page</div>
+            <div class="help-text">&#8596;&#8597; Slide to position the table on the printed page</div>
         </div>
 
         <div class="control-group">
@@ -471,7 +648,7 @@
                 <span>Auto-fit Element Names (Smart Sizing)</span>
             </label>
             <div class="help-text" style="margin-top: -5px; margin-bottom: 10px;">
-                ✨ Makes each name as large as possible without clipping
+                &#10024; Makes each name as large as possible without clipping
             </div>
             
             <label>Name Size (when auto-fit off): <span class="value-display" id="val-rnm">0.75</span></label>
@@ -485,13 +662,47 @@
             <input type="range" id="rm" min="0.3" max="1.2" value="0.75" step="0.05" oninput="updateFonts()">
         </div>
 
+        <!-- Display Options -->
+        <div class="control-group">
+            <div style="font-weight: bold; font-size: 0.9rem; color: #333; margin-bottom: 8px;">&#128065; Display Options</div>
+
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-names" checked onchange="updateDisplayOptions()">
+                <span>Show Element Names</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-mass" checked onchange="updateDisplayOptions()">
+                <span>Show Atomic Mass</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-state" checked onchange="updateDisplayOptions()">
+                <span>Show State of Matter (symbol style)</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-patterns" checked onchange="updateDisplayOptions()">
+                <span>Show Category Patterns (B&amp;W friendly)</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-econfig" onchange="updateDisplayOptions()">
+                <span>Show Electron Configuration</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-eneg" onchange="updateDisplayOptions()">
+                <span>Show Electronegativity</span>
+            </label>
+            <label class="checkbox-label" style="margin-bottom: 6px;">
+                <input type="checkbox" id="opt-legend" checked onchange="updateDisplayOptions()">
+                <span>Show Legend</span>
+            </label>
+        </div>
+
         <div class="btn-row">
-            <button class="action-btn fit" onclick="fitToPage()" title="Automatically optimize for printing">📐 Fit to Page</button>
-            <button class="action-btn reset" onclick="resetDefaults()">↺ Reset</button>
+            <button class="action-btn fit" onclick="fitToPage()" title="Automatically optimize for printing">&#128208; Fit to Page</button>
+            <button class="action-btn reset" onclick="resetDefaults()">&#8635; Reset</button>
         </div>
         
         <div class="btn-row">
-            <button class="action-btn" onclick="window.print()" style="flex: 1 1 100%;">🖨 Print</button>
+            <button class="action-btn" onclick="window.print()" style="flex: 1 1 100%;">&#128424; Print</button>
         </div>
 
         <div class="help-text" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px; border-left: 3px solid #007bff;">
@@ -499,7 +710,7 @@
             1. Click "Preview Print" to see layout<br>
             2. Use Horizontal/Vertical Position to center the table<br>
             3. Auto-fit keeps names large and unclipped<br>
-            4. Table Scale controls zoom level<br>
+            4. Table Scale controls zoom level (100% = perfect fit)<br>
             5. Click Print or press Ctrl+P
         </div>
     </div>
@@ -511,44 +722,199 @@
         <div class="margin-guide right"></div>
         
         <div class="table-wrapper">
-            <div class="periodic-table" id="table-container"></div>
+            <div class="periodic-table show-patterns show-state" id="table-container"></div>
         </div>
     </div>
 
 <script>
-    // --- DATA ---
+    // --- ELEMENT DATA ---
+    // Fields: n=atomic number, s=symbol, name=full name, m=mass,
+    //         g=group class (legacy, for range placeholders),
+    //         cat=classification, state=state of matter,
+    //         eneg=electronegativity (Pauling), econfig=electron config (first 36 only)
+    // cat values: alkali, alkaline, tm, ptm, metalloid, nonmetal, noble, lan, act
+    // state values: solid, liquid, gas, synthetic
+
+    // Default scale: 0.91 raw = "100%" in UI (prints perfectly at landscape 100%)
+    const DEFAULT_SCALE = 0.91;
+
     const elements = [
-        {n: 1, s:"H", name:"Hydrogen", m:1.008, g:"g1"}, {n:0, s:"", m:0, g:"spacer", c: 16}, {n:2, s:"He", name:"Helium", m:4.0026, g:"g18"},
-        {n:3, s:"Li", name:"Lithium", m:6.94, g:"g1"}, {n: 4, s:"Be", name:"Beryllium", m:9.0122, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:5, s:"B", name:"Boron", m:10.81, g:"g13"}, {n:6, s:"C", name:"Carbon", m:12.011, g:"g14"}, {n:7, s:"N", name:"Nitrogen", m:14.007, g:"g15"}, {n:8, s:"O", name:"Oxygen", m:15.999, g:"g16"}, {n:9, s:"F", name:"Fluorine", m:18.998, g:"g17"}, {n:10, s:"Ne", name:"Neon", m:20.180, g:"g18"},
-        {n:11, s:"Na", name:"Sodium", m:22.990, g:"g1"}, {n:12, s:"Mg", name:"Magnesium", m:24.305, g:"g2"}, {n:0, s:"", m:0, g:"spacer", c:10}, {n:13, s:"Al", name:"Aluminum", m:26.982, g:"g13"}, {n:14, s:"Si", name:"Silicon", m:28.085, g:"g14"}, {n:15, s:"P", name:"Phosphorus", m:30.974, g:"g15"}, {n:16, s:"S", name:"Sulfur", m: 32.06, g:"g16"}, {n:17, s:"Cl", name:"Chlorine", m:35.45, g:"g17"}, {n:18, s:"Ar", name:"Argon", m:39.948, g:"g18"},
-        {n:19, s:"K", name:"Potassium", m:39.098, g:"g1"}, {n:20, s:"Ca", name:"Calcium", m:40.078, g:"g2"}, {n:21, s:"Sc", name:"Scandium", m: 44.956, g:"tm"}, {n:22, s:"Ti", name:"Titanium", m:47.867, g:"tm"}, {n:23, s:"V", name:"Vanadium", m:50.942, g:"tm"}, {n: 24, s:"Cr", name:"Chromium", m:51.996, g:"tm"}, {n:25, s:"Mn", name:"Manganese", m:54.938, g:"tm"}, {n:26, s:"Fe", name:"Iron", m:55.845, g:"tm"}, {n:27, s:"Co", name:"Cobalt", m:58.933, g:"tm"}, {n: 28, s:"Ni", name:"Nickel", m:58.693, g:"tm"}, {n:29, s:"Cu", name:"Copper", m:63.546, g:"tm"}, {n:30, s:"Zn", name:"Zinc", m:65.38, g:"tm"}, {n:31, s:"Ga", name:"Gallium", m: 69.723, g:"g13"}, {n:32, s:"Ge", name:"Germanium", m:72.630, g:"g14"}, {n:33, s:"As", name:"Arsenic", m: 74.922, g:"g15"}, {n:34, s:"Se", name:"Selenium", m:78.971, g:"g16"}, {n:35, s:"Br", name:"Bromine", m:79.904, g:"g17"}, {n: 36, s:"Kr", name:"Krypton", m:83.798, g:"g18"},
-        {n:37, s:"Rb", name:"Rubidium", m:85.468, g:"g1"}, {n:38, s:"Sr", name:"Strontium", m:87.62, g:"g2"}, {n:39, s:"Y", name:"Yttrium", m:88.906, g:"tm"}, {n:40, s:"Zr", name:"Zirconium", m:91.224, g:"tm"}, {n:41, s:"Nb", name:"Niobium", m:92.906, g:"tm"}, {n:42, s:"Mo", name:"Molybdenum", m:95.95, g:"tm"}, {n:43, s:"Tc", name:"Technetium", m:98, g:"tm"}, {n: 44, s:"Ru", name:"Ruthenium", m: 101.07, g:"tm"}, {n:45, s:"Rh", name:"Rhodium", m:102.91, g:"tm"}, {n: 46, s:"Pd", name:"Palladium", m: 106.42, g:"tm"}, {n:47, s:"Ag", name:"Silver", m:107.87, g:"tm"}, {n:48, s:"Cd", name:"Cadmium", m:112.41, g:"tm"}, {n:49, s:"In", name:"Indium", m:114.82, g:"g13"}, {n:50, s:"Sn", name:"Tin", m:118.71, g:"g14"}, {n: 51, s:"Sb", name:"Antimony", m:121.76, g:"g15"}, {n:52, s:"Te", name:"Tellurium", m:127.60, g:"g16"}, {n: 53, s:"I", name:"Iodine", m:126.90, g:"g17"}, {n:54, s:"Xe", name:"Xenon", m:131.29, g:"g18"},
-        {n:55, s:"Cs", name:"Cesium", m:132.91, g:"g1"}, {n:56, s:"Ba", name:"Barium", m: 137.33, g:"g2"}, {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La-Lu"}, {n:72, s:"Hf", name:"Hafnium", m:178.49, g:"tm"}, {n:73, s:"Ta", name:"Tantalum", m:180.95, g:"tm"}, {n:74, s:"W", name:"Tungsten", m:183.84, g:"tm"}, {n:75, s:"Re", name:"Rhenium", m: 186.21, g:"tm"}, {n:76, s:"Os", name:"Osmium", m:190.23, g:"tm"}, {n:77, s:"Ir", name:"Iridium", m:192.22, g:"tm"}, {n:78, s:"Pt", name:"Platinum", m: 195.08, g:"tm"}, {n:79, s:"Au", name:"Gold", m: 196.97, g:"tm"}, {n:80, s:"Hg", name:"Mercury", m:200.59, g:"tm"}, {n:81, s:"Tl", name:"Thallium", m:204.38, g:"g13"}, {n:82, s:"Pb", name:"Lead", m:207.2, g:"g14"}, {n: 83, s:"Bi", name:"Bismuth", m:208.98, g:"g15"}, {n:84, s:"Po", name:"Polonium", m:209, g:"g16"}, {n:85, s:"At", name:"Astatine", m:210, g:"g17"}, {n:86, s:"Rn", name:"Radon", m:222, g:"g18"},
-        {n:87, s:"Fr", name:"Francium", m:223, g:"g1"}, {n:88, s:"Ra", name:"Radium", m:226, g:"g2"}, {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac-Lr"}, {n:104, s:"Rf", name:"Rutherfordium", m:267, g:"tm"}, {n:105, s:"Db", name:"Dubnium", m:268, g:"tm"}, {n:106, s:"Sg", name:"Seaborgium", m:269, g:"tm"}, {n:107, s:"Bh", name:"Bohrium", m:270, g:"tm"}, {n:108, s:"Hs", name:"Hassium", m:277, g:"tm"}, {n:109, s:"Mt", name:"Meitnerium", m:278, g:"tm"}, {n:110, s:"Ds", name:"Darmstadtium", m:281, g:"tm"}, {n:111, s:"Rg", name:"Roentgenium", m:282, g:"tm"}, {n:112, s:"Cn", name:"Copernicium", m:285, g:"tm"}, {n:113, s:"Nh", name:"Nihonium", m: 286, g:"g13"}, {n:114, s:"Fl", name:"Flerovium", m:289, g:"g14"}, {n:115, s:"Mc", name:"Moscovium", m:290, g:"g15"}, {n:116, s:"Lv", name:"Livermorium", m:293, g:"g16"}, {n:117, s:"Ts", name:"Tennessine", m:294, g:"g17"}, {n:118, s:"Og", name:"Oganesson", m:294, g:"g18"}
+        {n:1,  s:"H",  name:"Hydrogen",      m:1.008,   cat:"nonmetal",  state:"gas",       eneg:2.20, econfig:"1s\u00B9",             g:"nonmetal"},
+        {n:0,  s:"",   m:0, g:"spacer", c:16},
+        {n:2,  s:"He", name:"Helium",        m:4.0026,  cat:"noble",     state:"gas",       eneg:null, econfig:"1s\u00B2",             g:"noble"},
+
+        {n:3,  s:"Li", name:"Lithium",       m:6.94,    cat:"alkali",    state:"solid",     eneg:0.98, econfig:"[He] 2s\u00B9",        g:"alkali"},
+        {n:4,  s:"Be", name:"Beryllium",     m:9.0122,  cat:"alkaline",  state:"solid",     eneg:1.57, econfig:"[He] 2s\u00B2",        g:"alkaline"},
+        {n:0,  s:"",   m:0, g:"spacer", c:10},
+        {n:5,  s:"B",  name:"Boron",         m:10.81,   cat:"metalloid", state:"solid",     eneg:2.04, econfig:"[He] 2s\u00B2 2p\u00B9",g:"metalloid"},
+        {n:6,  s:"C",  name:"Carbon",        m:12.011,  cat:"nonmetal",  state:"solid",     eneg:2.55, econfig:"[He] 2s\u00B2 2p\u00B2",g:"nonmetal"},
+        {n:7,  s:"N",  name:"Nitrogen",      m:14.007,  cat:"nonmetal",  state:"gas",       eneg:3.04, econfig:"[He] 2s\u00B2 2p\u00B3",g:"nonmetal"},
+        {n:8,  s:"O",  name:"Oxygen",        m:15.999,  cat:"nonmetal",  state:"gas",       eneg:3.44, econfig:"[He] 2s\u00B2 2p\u2074",g:"nonmetal"},
+        {n:9,  s:"F",  name:"Fluorine",      m:18.998,  cat:"nonmetal",  state:"gas",       eneg:3.98, econfig:"[He] 2s\u00B2 2p\u2075",g:"nonmetal"},
+        {n:10, s:"Ne", name:"Neon",          m:20.180,  cat:"noble",     state:"gas",       eneg:null, econfig:"[He] 2s\u00B2 2p\u2076",g:"noble"},
+
+        {n:11, s:"Na", name:"Sodium",        m:22.990,  cat:"alkali",    state:"solid",     eneg:0.93, econfig:"[Ne] 3s\u00B9",        g:"alkali"},
+        {n:12, s:"Mg", name:"Magnesium",     m:24.305,  cat:"alkaline",  state:"solid",     eneg:1.31, econfig:"[Ne] 3s\u00B2",        g:"alkaline"},
+        {n:0,  s:"",   m:0, g:"spacer", c:10},
+        {n:13, s:"Al", name:"Aluminum",      m:26.982,  cat:"ptm",       state:"solid",     eneg:1.61, econfig:"[Ne] 3s\u00B2 3p\u00B9",g:"ptm"},
+        {n:14, s:"Si", name:"Silicon",       m:28.085,  cat:"metalloid", state:"solid",     eneg:1.90, econfig:"[Ne] 3s\u00B2 3p\u00B2",g:"metalloid"},
+        {n:15, s:"P",  name:"Phosphorus",    m:30.974,  cat:"nonmetal",  state:"solid",     eneg:2.19, econfig:"[Ne] 3s\u00B2 3p\u00B3",g:"nonmetal"},
+        {n:16, s:"S",  name:"Sulfur",        m:32.06,   cat:"nonmetal",  state:"solid",     eneg:2.58, econfig:"[Ne] 3s\u00B2 3p\u2074",g:"nonmetal"},
+        {n:17, s:"Cl", name:"Chlorine",      m:35.45,   cat:"nonmetal",  state:"gas",       eneg:3.16, econfig:"[Ne] 3s\u00B2 3p\u2075",g:"nonmetal"},
+        {n:18, s:"Ar", name:"Argon",         m:39.948,  cat:"noble",     state:"gas",       eneg:null, econfig:"[Ne] 3s\u00B2 3p\u2076",g:"noble"},
+
+        {n:19, s:"K",  name:"Potassium",     m:39.098,  cat:"alkali",    state:"solid",     eneg:0.82, econfig:"[Ar] 4s\u00B9",                      g:"alkali"},
+        {n:20, s:"Ca", name:"Calcium",       m:40.078,  cat:"alkaline",  state:"solid",     eneg:1.00, econfig:"[Ar] 4s\u00B2",                      g:"alkaline"},
+        {n:21, s:"Sc", name:"Scandium",      m:44.956,  cat:"tm",        state:"solid",     eneg:1.36, econfig:"[Ar] 3d\u00B9 4s\u00B2",             g:"tm"},
+        {n:22, s:"Ti", name:"Titanium",      m:47.867,  cat:"tm",        state:"solid",     eneg:1.54, econfig:"[Ar] 3d\u00B2 4s\u00B2",             g:"tm"},
+        {n:23, s:"V",  name:"Vanadium",      m:50.942,  cat:"tm",        state:"solid",     eneg:1.63, econfig:"[Ar] 3d\u00B3 4s\u00B2",             g:"tm"},
+        {n:24, s:"Cr", name:"Chromium",      m:51.996,  cat:"tm",        state:"solid",     eneg:1.66, econfig:"[Ar] 3d\u2075 4s\u00B9",             g:"tm"},
+        {n:25, s:"Mn", name:"Manganese",     m:54.938,  cat:"tm",        state:"solid",     eneg:1.55, econfig:"[Ar] 3d\u2075 4s\u00B2",             g:"tm"},
+        {n:26, s:"Fe", name:"Iron",          m:55.845,  cat:"tm",        state:"solid",     eneg:1.83, econfig:"[Ar] 3d\u2076 4s\u00B2",             g:"tm"},
+        {n:27, s:"Co", name:"Cobalt",        m:58.933,  cat:"tm",        state:"solid",     eneg:1.88, econfig:"[Ar] 3d\u2077 4s\u00B2",             g:"tm"},
+        {n:28, s:"Ni", name:"Nickel",        m:58.693,  cat:"tm",        state:"solid",     eneg:1.91, econfig:"[Ar] 3d\u2078 4s\u00B2",             g:"tm"},
+        {n:29, s:"Cu", name:"Copper",        m:63.546,  cat:"tm",        state:"solid",     eneg:1.90, econfig:"[Ar] 3d\u00B9\u2070 4s\u00B9",       g:"tm"},
+        {n:30, s:"Zn", name:"Zinc",          m:65.38,   cat:"tm",        state:"solid",     eneg:1.65, econfig:"[Ar] 3d\u00B9\u2070 4s\u00B2",       g:"tm"},
+        {n:31, s:"Ga", name:"Gallium",       m:69.723,  cat:"ptm",       state:"solid",     eneg:1.81, econfig:"[Ar] 3d\u00B9\u2070 4p\u00B9",       g:"ptm"},
+        {n:32, s:"Ge", name:"Germanium",     m:72.630,  cat:"metalloid", state:"solid",     eneg:2.01, econfig:"[Ar] 3d\u00B9\u2070 4p\u00B2",       g:"metalloid"},
+        {n:33, s:"As", name:"Arsenic",       m:74.922,  cat:"metalloid", state:"solid",     eneg:2.18, econfig:"[Ar] 3d\u00B9\u2070 4p\u00B3",       g:"metalloid"},
+        {n:34, s:"Se", name:"Selenium",      m:78.971,  cat:"nonmetal",  state:"solid",     eneg:2.55, econfig:"[Ar] 3d\u00B9\u2070 4p\u2074",       g:"nonmetal"},
+        {n:35, s:"Br", name:"Bromine",       m:79.904,  cat:"nonmetal",  state:"liquid",    eneg:2.96, econfig:"[Ar] 3d\u00B9\u2070 4p\u2075",       g:"nonmetal"},
+        {n:36, s:"Kr", name:"Krypton",       m:83.798,  cat:"noble",     state:"gas",       eneg:null, econfig:"[Ar] 3d\u00B9\u2070 4p\u2076",       g:"noble"},
+
+        {n:37, s:"Rb", name:"Rubidium",      m:85.468,  cat:"alkali",    state:"solid",     eneg:0.82, econfig:"", g:"alkali"},
+        {n:38, s:"Sr", name:"Strontium",     m:87.62,   cat:"alkaline",  state:"solid",     eneg:0.95, econfig:"", g:"alkaline"},
+        {n:39, s:"Y",  name:"Yttrium",       m:88.906,  cat:"tm",        state:"solid",     eneg:1.22, econfig:"", g:"tm"},
+        {n:40, s:"Zr", name:"Zirconium",     m:91.224,  cat:"tm",        state:"solid",     eneg:1.33, econfig:"", g:"tm"},
+        {n:41, s:"Nb", name:"Niobium",       m:92.906,  cat:"tm",        state:"solid",     eneg:1.60, econfig:"", g:"tm"},
+        {n:42, s:"Mo", name:"Molybdenum",    m:95.95,   cat:"tm",        state:"solid",     eneg:2.16, econfig:"", g:"tm"},
+        {n:43, s:"Tc", name:"Technetium",    m:98,      cat:"tm",        state:"synthetic", eneg:2.10, econfig:"", g:"tm"},
+        {n:44, s:"Ru", name:"Ruthenium",     m:101.07,  cat:"tm",        state:"solid",     eneg:2.20, econfig:"", g:"tm"},
+        {n:45, s:"Rh", name:"Rhodium",       m:102.91,  cat:"tm",        state:"solid",     eneg:2.28, econfig:"", g:"tm"},
+        {n:46, s:"Pd", name:"Palladium",     m:106.42,  cat:"tm",        state:"solid",     eneg:2.20, econfig:"", g:"tm"},
+        {n:47, s:"Ag", name:"Silver",        m:107.87,  cat:"tm",        state:"solid",     eneg:1.93, econfig:"", g:"tm"},
+        {n:48, s:"Cd", name:"Cadmium",       m:112.41,  cat:"tm",        state:"solid",     eneg:1.69, econfig:"", g:"tm"},
+        {n:49, s:"In", name:"Indium",        m:114.82,  cat:"ptm",       state:"solid",     eneg:1.78, econfig:"", g:"ptm"},
+        {n:50, s:"Sn", name:"Tin",           m:118.71,  cat:"ptm",       state:"solid",     eneg:1.96, econfig:"", g:"ptm"},
+        {n:51, s:"Sb", name:"Antimony",      m:121.76,  cat:"metalloid", state:"solid",     eneg:2.05, econfig:"", g:"metalloid"},
+        {n:52, s:"Te", name:"Tellurium",     m:127.60,  cat:"metalloid", state:"solid",     eneg:2.10, econfig:"", g:"metalloid"},
+        {n:53, s:"I",  name:"Iodine",        m:126.90,  cat:"nonmetal",  state:"solid",     eneg:2.66, econfig:"", g:"nonmetal"},
+        {n:54, s:"Xe", name:"Xenon",         m:131.29,  cat:"noble",     state:"gas",       eneg:null, econfig:"", g:"noble"},
+
+        {n:55, s:"Cs", name:"Cesium",        m:132.91,  cat:"alkali",    state:"solid",     eneg:0.79, econfig:"", g:"alkali"},
+        {n:56, s:"Ba", name:"Barium",        m:137.33,  cat:"alkaline",  state:"solid",     eneg:0.89, econfig:"", g:"alkaline"},
+        {n:5771, s:"57-71", name:"", m:"", g:"lan", text:"La\u2013Lu", cat:"lan"},
+        {n:72, s:"Hf", name:"Hafnium",       m:178.49,  cat:"tm",        state:"solid",     eneg:1.30, econfig:"", g:"tm"},
+        {n:73, s:"Ta", name:"Tantalum",      m:180.95,  cat:"tm",        state:"solid",     eneg:1.50, econfig:"", g:"tm"},
+        {n:74, s:"W",  name:"Tungsten",      m:183.84,  cat:"tm",        state:"solid",     eneg:2.36, econfig:"", g:"tm"},
+        {n:75, s:"Re", name:"Rhenium",       m:186.21,  cat:"tm",        state:"solid",     eneg:1.90, econfig:"", g:"tm"},
+        {n:76, s:"Os", name:"Osmium",        m:190.23,  cat:"tm",        state:"solid",     eneg:2.20, econfig:"", g:"tm"},
+        {n:77, s:"Ir", name:"Iridium",       m:192.22,  cat:"tm",        state:"solid",     eneg:2.20, econfig:"", g:"tm"},
+        {n:78, s:"Pt", name:"Platinum",      m:195.08,  cat:"tm",        state:"solid",     eneg:2.28, econfig:"", g:"tm"},
+        {n:79, s:"Au", name:"Gold",          m:196.97,  cat:"tm",        state:"solid",     eneg:2.54, econfig:"", g:"tm"},
+        {n:80, s:"Hg", name:"Mercury",       m:200.59,  cat:"tm",        state:"liquid",    eneg:2.00, econfig:"", g:"tm"},
+        {n:81, s:"Tl", name:"Thallium",      m:204.38,  cat:"ptm",       state:"solid",     eneg:1.62, econfig:"", g:"ptm"},
+        {n:82, s:"Pb", name:"Lead",          m:207.2,   cat:"ptm",       state:"solid",     eneg:2.33, econfig:"", g:"ptm"},
+        {n:83, s:"Bi", name:"Bismuth",       m:208.98,  cat:"ptm",       state:"solid",     eneg:2.02, econfig:"", g:"ptm"},
+        {n:84, s:"Po", name:"Polonium",      m:209,     cat:"ptm",       state:"solid",     eneg:2.00, econfig:"", g:"ptm"},
+        {n:85, s:"At", name:"Astatine",      m:210,     cat:"nonmetal",  state:"synthetic", eneg:2.20, econfig:"", g:"nonmetal"},
+        {n:86, s:"Rn", name:"Radon",         m:222,     cat:"noble",     state:"gas",       eneg:null, econfig:"", g:"noble"},
+
+        {n:87,  s:"Fr", name:"Francium",     m:223,     cat:"alkali",    state:"synthetic", eneg:0.70, econfig:"", g:"alkali"},
+        {n:88,  s:"Ra", name:"Radium",       m:226,     cat:"alkaline",  state:"synthetic", eneg:0.90, econfig:"", g:"alkaline"},
+        {n:8903, s:"89-103", name:"", m:"", g:"act", text:"Ac\u2013Lr", cat:"act"},
+        {n:104, s:"Rf", name:"Rutherfordium",m:267,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:105, s:"Db", name:"Dubnium",      m:268,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:106, s:"Sg", name:"Seaborgium",   m:269,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:107, s:"Bh", name:"Bohrium",      m:270,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:108, s:"Hs", name:"Hassium",      m:277,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:109, s:"Mt", name:"Meitnerium",   m:278,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:110, s:"Ds", name:"Darmstadtium", m:281,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:111, s:"Rg", name:"Roentgenium",  m:282,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:112, s:"Cn", name:"Copernicium",  m:285,     cat:"tm",        state:"synthetic", eneg:null, econfig:"", g:"tm"},
+        {n:113, s:"Nh", name:"Nihonium",     m:286,     cat:"ptm",       state:"synthetic", eneg:null, econfig:"", g:"ptm"},
+        {n:114, s:"Fl", name:"Flerovium",    m:289,     cat:"ptm",       state:"synthetic", eneg:null, econfig:"", g:"ptm"},
+        {n:115, s:"Mc", name:"Moscovium",    m:290,     cat:"ptm",       state:"synthetic", eneg:null, econfig:"", g:"ptm"},
+        {n:116, s:"Lv", name:"Livermorium",  m:293,     cat:"ptm",       state:"synthetic", eneg:null, econfig:"", g:"ptm"},
+        {n:117, s:"Ts", name:"Tennessine",   m:294,     cat:"noble",     state:"synthetic", eneg:null, econfig:"", g:"noble"},
+        {n:118, s:"Og", name:"Oganesson",    m:294,     cat:"noble",     state:"synthetic", eneg:null, econfig:"", g:"noble"}
     ];
 
     const lanthanides = [
-        {n:57, s:"La", name:"Lanthanum", m: 138.91, g:"lan"}, {n:58, s:"Ce", name:"Cerium", m:140.12, g:"lan"}, {n:59, s:"Pr", name:"Praseodymium", m:140.91, g:"lan"}, {n:60, s:"Nd", name:"Neodymium", m:144.24, g:"lan"}, {n:61, s:"Pm", name:"Promethium", m:145, g:"lan"}, {n:62, s:"Sm", name:"Samarium", m: 150.36, g:"lan"}, {n:63, s:"Eu", name:"Europium", m:151.96, g:"lan"}, {n:64, s:"Gd", name:"Gadolinium", m: 157.25, g:"lan"}, {n:65, s:"Tb", name:"Terbium", m:158.93, g:"lan"}, {n: 66, s:"Dy", name:"Dysprosium", m:162.50, g:"lan"}, {n:67, s:"Ho", name:"Holmium", m:164.93, g:"lan"}, {n:68, s:"Er", name:"Erbium", m:167.26, g:"lan"}, {n:69, s:"Tm", name:"Thulium", m:168.93, g:"lan"}, {n:70, s:"Yb", name:"Ytterbium", m:173.05, g:"lan"}, {n:71, s:"Lu", name:"Lutetium", m: 174.97, g:"lan"}
+        {n:57,  s:"La", name:"Lanthanum",    m:138.91,  cat:"lan", state:"solid",     eneg:1.10, econfig:""},
+        {n:58,  s:"Ce", name:"Cerium",       m:140.12,  cat:"lan", state:"solid",     eneg:1.12, econfig:""},
+        {n:59,  s:"Pr", name:"Praseodymium", m:140.91,  cat:"lan", state:"solid",     eneg:1.13, econfig:""},
+        {n:60,  s:"Nd", name:"Neodymium",    m:144.24,  cat:"lan", state:"solid",     eneg:1.14, econfig:""},
+        {n:61,  s:"Pm", name:"Promethium",   m:145,     cat:"lan", state:"synthetic", eneg:1.13, econfig:""},
+        {n:62,  s:"Sm", name:"Samarium",     m:150.36,  cat:"lan", state:"solid",     eneg:1.17, econfig:""},
+        {n:63,  s:"Eu", name:"Europium",     m:151.96,  cat:"lan", state:"solid",     eneg:1.20, econfig:""},
+        {n:64,  s:"Gd", name:"Gadolinium",   m:157.25,  cat:"lan", state:"solid",     eneg:1.20, econfig:""},
+        {n:65,  s:"Tb", name:"Terbium",      m:158.93,  cat:"lan", state:"solid",     eneg:1.20, econfig:""},
+        {n:66,  s:"Dy", name:"Dysprosium",   m:162.50,  cat:"lan", state:"solid",     eneg:1.22, econfig:""},
+        {n:67,  s:"Ho", name:"Holmium",      m:164.93,  cat:"lan", state:"solid",     eneg:1.23, econfig:""},
+        {n:68,  s:"Er", name:"Erbium",       m:167.26,  cat:"lan", state:"solid",     eneg:1.24, econfig:""},
+        {n:69,  s:"Tm", name:"Thulium",      m:168.93,  cat:"lan", state:"solid",     eneg:1.25, econfig:""},
+        {n:70,  s:"Yb", name:"Ytterbium",    m:173.05,  cat:"lan", state:"solid",     eneg:1.10, econfig:""},
+        {n:71,  s:"Lu", name:"Lutetium",     m:174.97,  cat:"lan", state:"solid",     eneg:1.00, econfig:""}
     ];
 
     const actinides = [
-        {n: 89, s:"Ac", name:"Actinium", m:227, g:"act"}, {n: 90, s:"Th", name:"Thorium", m:232.04, g:"act"}, {n:91, s:"Pa", name:"Protactinium", m: 231.04, g:"act"}, {n:92, s:"U", name:"Uranium", m:238.03, g:"act"}, {n:93, s:"Np", name:"Neptunium", m:237, g:"act"}, {n: 94, s:"Pu", name:"Plutonium", m:244, g:"act"}, {n: 95, s:"Am", name:"Americium", m:243, g:"act"}, {n: 96, s:"Cm", name:"Curium", m:247, g:"act"}, {n:97, s:"Bk", name:"Berkelium", m:247, g:"act"}, {n:98, s:"Cf", name:"Californium", m:251, g:"act"}, {n:99, s:"Es", name:"Einsteinium", m:252, g:"act"}, {n:100, s:"Fm", name:"Fermium", m:257, g:"act"}, {n:101, s:"Md", name:"Mendelevium", m:258, g:"act"}, {n:102, s:"No", name:"Nobelium", m:259, g:"act"}, {n:103, s:"Lr", name:"Lawrencium", m:266, g:"act"}
+        {n:89,  s:"Ac", name:"Actinium",     m:227,     cat:"act", state:"solid",     eneg:1.10, econfig:""},
+        {n:90,  s:"Th", name:"Thorium",      m:232.04,  cat:"act", state:"solid",     eneg:1.30, econfig:""},
+        {n:91,  s:"Pa", name:"Protactinium", m:231.04,  cat:"act", state:"solid",     eneg:1.50, econfig:""},
+        {n:92,  s:"U",  name:"Uranium",      m:238.03,  cat:"act", state:"solid",     eneg:1.38, econfig:""},
+        {n:93,  s:"Np", name:"Neptunium",    m:237,     cat:"act", state:"synthetic", eneg:1.36, econfig:""},
+        {n:94,  s:"Pu", name:"Plutonium",    m:244,     cat:"act", state:"synthetic", eneg:1.28, econfig:""},
+        {n:95,  s:"Am", name:"Americium",    m:243,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:96,  s:"Cm", name:"Curium",       m:247,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:97,  s:"Bk", name:"Berkelium",    m:247,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:98,  s:"Cf", name:"Californium",  m:251,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:99,  s:"Es", name:"Einsteinium",  m:252,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:100, s:"Fm", name:"Fermium",      m:257,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:101, s:"Md", name:"Mendelevium",  m:258,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:102, s:"No", name:"Nobelium",     m:259,     cat:"act", state:"synthetic", eneg:1.30, econfig:""},
+        {n:103, s:"Lr", name:"Lawrencium",   m:266,     cat:"act", state:"synthetic", eneg:null, econfig:""}
     ];
+
+    // Category display names and legend swatch styles
+    const CAT_INFO = {
+        alkali:    { label: "Alkali Metal",          color: "#ffcccc" },
+        alkaline:  { label: "Alkaline Earth Metal",  color: "#ffdead" },
+        tm:        { label: "Transition Metal",       color: "#ffffcc" },
+        ptm:       { label: "Post-Transition Metal",  color: "#ccffcc" },
+        metalloid: { label: "Metalloid",              color: "#ccffff" },
+        nonmetal:  { label: "Reactive Nonmetal",      color: "#e6ccff" },
+        noble:     { label: "Noble Gas",              color: "#e6e6e6" },
+        lan:       { label: "Lanthanide",             color: "#ffb3e6" },
+        act:       { label: "Actinide",               color: "#ff99cc" }
+    };
+
+    // Pattern inline styles for legend swatches (mirrors CSS patterns)
+    const CAT_PATTERN = {
+        alkali:    "repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)",
+        alkaline:  "repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)",
+        tm:        "repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.09) 4px,rgba(0,0,0,.09) 5px),repeating-linear-gradient(-45deg,transparent,transparent 4px,rgba(0,0,0,.09) 4px,rgba(0,0,0,.09) 5px)",
+        ptm:       "repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)",
+        metalloid: "repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)",
+        nonmetal:  null, // dots — handled separately
+        noble:     "repeating-linear-gradient(0deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 5px),repeating-linear-gradient(90deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 5px)",
+        lan:       "repeating-linear-gradient(0deg,transparent,transparent 5px,rgba(0,0,0,.10) 5px,rgba(0,0,0,.10) 6px)",
+        act:       "repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.10) 3px,rgba(0,0,0,.10) 4px),repeating-linear-gradient(90deg,transparent,transparent 6px,rgba(0,0,0,.10) 6px,rgba(0,0,0,.10) 7px)"
+    };
 
     // Calculate appropriate font size based on name length
     function calculateNameSize(name, maxSize) {
-        const baseLength = 6; // Short names like "Helium" get max size
+        const baseLength = 6;
         const length = name.length;
         if (length <= baseLength) return maxSize;
         const scaleFactor = baseLength / length;
-        const minSize = 0.40; // Minimum readable size
+        const minSize = 0.40;
         return Math.max(minSize, maxSize * scaleFactor);
     }
 
     // --- UI LOGIC ---
     function toggleMenu() {
-        const panel = document.getElementById('controls-panel');
-        panel.classList.toggle('open');
+        document.getElementById('controls-panel').classList.toggle('open');
     }
 
     function togglePreview() {
@@ -600,9 +966,21 @@
 
         document.getElementById('val-mtb').textContent = mtb + 'px';
         document.getElementById('val-mlr').textContent = mlr + 'px';
-        document.getElementById('val-scale').textContent = Math.round(scale * 100) + '%';
+        // DEFAULT_SCALE raw = 100% — display accordingly
+        document.getElementById('val-scale').textContent = Math.round((parseFloat(scale) / DEFAULT_SCALE) * 100) + '%';
         document.getElementById('val-offsetx').textContent = offsetX + 'px';
         document.getElementById('val-offsety').textContent = offsetY + 'px';
+    }
+
+    function updateDisplayOptions() {
+        const tc = document.getElementById('table-container');
+        tc.classList.toggle('hide-names',    !document.getElementById('opt-names').checked);
+        tc.classList.toggle('hide-mass',     !document.getElementById('opt-mass').checked);
+        tc.classList.toggle('show-state',     document.getElementById('opt-state').checked);
+        tc.classList.toggle('show-patterns',  document.getElementById('opt-patterns').checked);
+        tc.classList.toggle('show-econfig',   document.getElementById('opt-econfig').checked);
+        tc.classList.toggle('show-eneg',      document.getElementById('opt-eneg').checked);
+        tc.classList.toggle('hide-legend',   !document.getElementById('opt-legend').checked);
     }
 
     function fitToPage() {
@@ -613,7 +991,7 @@
         document.getElementById('maxname').value = 0.85;
         document.getElementById('mtb').value = 8;
         document.getElementById('mlr').value = 8;
-        document.getElementById('scale').value = 0.88;
+        document.getElementById('scale').value = DEFAULT_SCALE;
         document.getElementById('offsetx').value = 0;
         document.getElementById('offsety').value = 0;
         document.getElementById('autofit').checked = true;
@@ -626,6 +1004,15 @@
     function resetDefaults() {
         fitToPage();
         document.getElementById('decimals').value = 1;
+        // Reset checkboxes to defaults
+        document.getElementById('opt-names').checked = true;
+        document.getElementById('opt-mass').checked = true;
+        document.getElementById('opt-state').checked = true;
+        document.getElementById('opt-patterns').checked = true;
+        document.getElementById('opt-econfig').checked = false;
+        document.getElementById('opt-eneg').checked = false;
+        document.getElementById('opt-legend').checked = true;
+        updateDisplayOptions();
         updateTableRender();
     }
 
@@ -633,17 +1020,17 @@
         const decimals = document.getElementById('decimals').value;
         document.getElementById('val-dec').innerText = decimals;
         renderTable(decimals);
+        updateDisplayOptions();
     }
 
     function renderTable(decimals) {
         const container = document.getElementById('table-container');
-        container.innerHTML = ""; 
+        container.innerHTML = "";
 
         const autoFit = document.getElementById('autofit').checked;
         const maxNameSize = parseFloat(document.getElementById('maxname').value);
         const fixedNameSize = parseFloat(document.getElementById('rnm').value);
 
-        // Helper to create group number cells
         const createGroupNumber = (num) => {
             const div = document.createElement('div');
             div.className = 'group-number';
@@ -651,7 +1038,6 @@
             return div;
         };
 
-        // Helper to create period number cells
         const createPeriodNumber = (num) => {
             const div = document.createElement('div');
             div.className = 'period-number';
@@ -667,36 +1053,87 @@
                 return div;
             }
 
-            div.className = `element ${data.g || ''}`;
-            
-            // Handle ranges (like 57-71)
-            if(data.text) {
-                div.innerHTML = `<div class="at-num">${data.s}</div><div class="symbol" style="font-size: var(--fs-name); margin-top: 5px;">${data.text}</div>`;
+            const catClass = data.cat ? `cat-${data.cat}` : '';
+            div.className = `element ${catClass}`.trim();
+
+            // State of matter data attribute for CSS styling
+            if (data.state) {
+                div.dataset.state = data.state;
+            }
+
+            // Range placeholder cells (e.g. 57-71, 89-103)
+            if (data.text) {
+                const catLabel = data.cat ? (CAT_INFO[data.cat] ? CAT_INFO[data.cat].label : '') : '';
+                div.title = catLabel ? catLabel + 's' : '';
+                const numDiv = document.createElement('div');
+                numDiv.className = 'at-num';
+                numDiv.textContent = data.s;
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'symbol';
+                labelDiv.style.fontSize = 'var(--fs-name)';
+                labelDiv.style.marginTop = '5px';
+                labelDiv.textContent = data.text;
+                div.appendChild(numDiv);
+                div.appendChild(labelDiv);
                 return div;
             }
 
-            let massDisplay = "";
-            if (typeof data.m === "number") {
-                massDisplay = data.m.toFixed(decimals);
-            } else {
-                massDisplay = data.m; 
+            // Build title attribute for accessibility
+            const catLabel = data.cat ? (CAT_INFO[data.cat] ? CAT_INFO[data.cat].label : '') : '';
+            const stateLabel = data.state ? data.state.charAt(0).toUpperCase() + data.state.slice(1) : '';
+            const massVal = typeof data.m === "number" ? data.m.toFixed(decimals) : (data.m || '');
+            let titleStr = `${data.name} (${data.s}) - Atomic Number: ${data.n}, Mass: ${massVal}`;
+            if (catLabel) titleStr += `, ${catLabel}`;
+            if (stateLabel) titleStr += `, ${stateLabel}`;
+            if (data.eneg !== null && data.eneg !== undefined) titleStr += `, Electronegativity: ${data.eneg.toFixed(2)}`;
+            if (data.econfig) titleStr += `, Config: ${data.econfig}`;
+            div.title = titleStr;
+
+            // Atomic number
+            const numDiv = document.createElement('div');
+            numDiv.className = 'at-num';
+            numDiv.textContent = data.n;
+            div.appendChild(numDiv);
+
+            // Electronegativity (corner badge — always rendered, shown via CSS class)
+            if (data.eneg !== null && data.eneg !== undefined) {
+                const enegDiv = document.createElement('div');
+                enegDiv.className = 'eneg';
+                enegDiv.textContent = data.eneg.toFixed(2);
+                div.appendChild(enegDiv);
             }
 
-            // Calculate name size if auto-fit is enabled
-            let nameStyle = '';
+            // Symbol
+            const symDiv = document.createElement('div');
+            symDiv.className = 'symbol';
+            symDiv.textContent = data.s;
+            div.appendChild(symDiv);
+
+            // Name
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
             if (autoFit && data.name) {
-                const calculatedSize = calculateNameSize(data.name, maxNameSize);
-                nameStyle = `style="font-size: ${calculatedSize}em;"`;
+                nameDiv.style.fontSize = calculateNameSize(data.name, maxNameSize) + 'em';
             } else {
-                nameStyle = `style="font-size: ${fixedNameSize}em;"`;
+                nameDiv.style.fontSize = fixedNameSize + 'em';
+            }
+            nameDiv.textContent = data.name;
+            div.appendChild(nameDiv);
+
+            // Mass
+            const massDiv = document.createElement('div');
+            massDiv.className = 'mass';
+            massDiv.textContent = massVal;
+            div.appendChild(massDiv);
+
+            // Electron configuration
+            if (data.econfig) {
+                const ecDiv = document.createElement('div');
+                ecDiv.className = 'econfig';
+                ecDiv.textContent = data.econfig;
+                div.appendChild(ecDiv);
             }
 
-            div.innerHTML = `
-                <div class="at-num">${data.n}</div>
-                <div class="symbol">${data.s}</div>
-                <div class="name" ${nameStyle}>${data.name}</div>
-                <div class="mass">${massDisplay}</div>
-            `;
             return div;
         };
 
@@ -708,31 +1145,19 @@
             container.appendChild(createGroupNumber(i));
         }
 
-        // === MAIN TABLE: Track grid columns to know when to insert period numbers ===
+        // === MAIN TABLE ===
         let currentPeriod = 1;
         let columnsInCurrentRow = 0;
-        
-        // Add period 1 number at start
         container.appendChild(createPeriodNumber(currentPeriod));
-        
+
         elements.forEach(el => {
-            // Check if we need to start a new row
             if (columnsInCurrentRow >= 18) {
                 currentPeriod++;
                 container.appendChild(createPeriodNumber(currentPeriod));
                 columnsInCurrentRow = 0;
             }
-            
-            // Create and add the element
-            const elementDiv = createEl(el);
-            container.appendChild(elementDiv);
-            
-            // Track columns (spacers span multiple columns)
-            if (el.g === "spacer") {
-                columnsInCurrentRow += el.c;
-            } else {
-                columnsInCurrentRow += 1;
-            }
+            container.appendChild(createEl(el));
+            columnsInCurrentRow += (el.g === "spacer") ? el.c : 1;
         });
 
         // === F-BLOCK SPACER ROW ===
@@ -740,27 +1165,115 @@
         spacerRow.className = "f-block-spacer";
         container.appendChild(spacerRow);
 
-        // === LANTHANIDES: Empty period cell + 3-column spacer + 15 elements ===
+        // === LANTHANIDES ===
         const lPeriodSpacer = document.createElement('div');
         lPeriodSpacer.className = "spacer";
         container.appendChild(lPeriodSpacer);
-        
         const lSpacer = document.createElement('div');
         lSpacer.className = "spacer";
         lSpacer.style.gridColumn = "span 3";
         container.appendChild(lSpacer);
         lanthanides.forEach(el => container.appendChild(createEl(el)));
 
-        // === ACTINIDES: Empty period cell + 3-column spacer + 15 elements ===
+        // === ACTINIDES ===
         const aPeriodSpacer = document.createElement('div');
         aPeriodSpacer.className = "spacer";
         container.appendChild(aPeriodSpacer);
-        
         const aSpacer = document.createElement('div');
         aSpacer.className = "spacer";
         aSpacer.style.gridColumn = "span 3";
         container.appendChild(aSpacer);
         actinides.forEach(el => container.appendChild(createEl(el)));
+
+        // === LEGEND ===
+        renderLegend(container);
+    }
+
+    function renderLegend(container) {
+        const legendDiv = document.createElement('div');
+        legendDiv.className = 'legend-container';
+        legendDiv.style.gridColumn = '1 / -1';
+
+        const showPatterns = document.getElementById('opt-patterns').checked;
+
+        // Title
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'legend-title';
+        titleDiv.textContent = 'Legend';
+        legendDiv.appendChild(titleDiv);
+
+        const sectionsDiv = document.createElement('div');
+        sectionsDiv.className = 'legend-sections';
+
+        // Category section
+        const catSection = document.createElement('div');
+        catSection.className = 'legend-section';
+        const catTitle = document.createElement('div');
+        catTitle.style.cssText = 'font-weight:bold;margin-bottom:3px;';
+        catTitle.textContent = 'Element Categories';
+        catSection.appendChild(catTitle);
+
+        const catGrid = document.createElement('div');
+        catGrid.className = 'legend-grid';
+
+        for (const [key, info] of Object.entries(CAT_INFO)) {
+            const item = document.createElement('div');
+            item.className = 'legend-item';
+
+            const swatch = document.createElement('span');
+            swatch.className = 'legend-swatch';
+            swatch.style.backgroundColor = info.color;
+            if (showPatterns && CAT_PATTERN[key]) {
+                swatch.style.backgroundImage = CAT_PATTERN[key];
+            } else if (showPatterns && key === 'nonmetal') {
+                swatch.style.backgroundImage = 'radial-gradient(circle,rgba(0,0,0,.18) 1px,transparent 1px)';
+                swatch.style.backgroundSize = '5px 5px';
+            }
+
+            const label = document.createElement('span');
+            label.textContent = info.label;
+            item.appendChild(swatch);
+            item.appendChild(label);
+            catGrid.appendChild(item);
+        }
+        catSection.appendChild(catGrid);
+
+        // State of matter section
+        const stateSection = document.createElement('div');
+        stateSection.className = 'legend-section';
+        const stateTitle = document.createElement('div');
+        stateTitle.style.cssText = 'font-weight:bold;margin-bottom:3px;';
+        stateTitle.textContent = 'State of Matter (at 25\u00B0C, 1 atm)';
+        stateSection.appendChild(stateTitle);
+
+        const states = [
+            { label: 'Solid',             sym: 'Fe', style: 'color:#000;font-weight:bold;' },
+            { label: 'Liquid',            sym: 'Hg', style: 'color:#000;font-weight:bold;text-decoration:underline double;' },
+            { label: 'Gas',               sym: 'O',  style: 'color:#0055bb;font-weight:bold;' },
+            { label: 'Synthetic/Unknown', sym: 'Np', style: 'color:#888;font-style:italic;font-weight:bold;' }
+        ];
+
+        const stateGrid = document.createElement('div');
+        stateGrid.className = 'legend-grid';
+        states.forEach(st => {
+            const item = document.createElement('div');
+            item.className = 'legend-state-item';
+            const symSpan = document.createElement('span');
+            symSpan.className = 'legend-state-sym';
+            symSpan.style.cssText = st.style;
+            symSpan.textContent = st.sym;
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = '= ' + st.label;
+            item.appendChild(symSpan);
+            item.appendChild(labelSpan);
+            stateGrid.appendChild(item);
+        });
+        stateSection.appendChild(stateGrid);
+
+        sectionsDiv.appendChild(catSection);
+        sectionsDiv.appendChild(stateSection);
+        legendDiv.appendChild(sectionsDiv);
+        container.appendChild(legendDiv);
     }
 
     // Initial Render with optimized defaults
@@ -768,6 +1281,7 @@
         renderTable(1);
         updateFonts();
         updateLayout();
+        updateDisplayOptions();
     });
 </script>
 </body>
