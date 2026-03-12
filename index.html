@@ -16,6 +16,8 @@
         --margin-tb: 8px;
         --margin-lr: 8px;
         --table-scale: 0.88; /* slightly smaller so it fits at 100% print zoom */
+        --table-offset-x: 0px;
+        --table-offset-y: 0px;
 
         /* Max name size for auto-fitting */
         --max-name-size: 0.85em;
@@ -245,8 +247,8 @@
     /* --- TABLE STYLES --- */
     .table-wrapper {
         display: inline-block;
-        transform: scale(var(--table-scale)); 
-        transform-origin: top center;
+        transform: scale(var(--table-scale)) translateX(var(--table-offset-x)) translateY(var(--table-offset-y));
+        transform-origin: top left;
         width: 100%;
         transition: transform 0.2s ease;
     }
@@ -255,7 +257,7 @@
         display: grid;
         grid-template-columns: repeat(19, 1fr);
         gap: 3px;
-        max-width: 1600px;
+        max-width: 100%;
         margin: 0 auto;
         font-size: 11pt;
     }
@@ -402,7 +404,8 @@
         }
 
         .table-wrapper {
-            transform: scale(var(--table-scale)) !important;
+            transform: scale(var(--table-scale)) translateX(var(--table-offset-x)) translateY(var(--table-offset-y)) !important;
+            transform-origin: top left !important;
             page-break-inside: avoid;
         }
     }
@@ -448,6 +451,15 @@
         </div>
 
         <div class="control-group">
+            <label>Horizontal Position: <span class="value-display" id="val-offsetx">0px</span></label>
+            <input type="range" id="offsetx" min="-200" max="200" value="0" step="1" oninput="updateLayout()">
+            
+            <label>Vertical Position: <span class="value-display" id="val-offsety">0px</span></label>
+            <input type="range" id="offsety" min="-100" max="100" value="0" step="1" oninput="updateLayout()">
+            <div class="help-text">↔↕ Slide to position the table on the printed page</div>
+        </div>
+
+        <div class="control-group">
             <label>Atomic Number Size: <span class="value-display" id="val-rn">0.70</span></label>
             <input type="range" id="rn" min="0.3" max="1.2" value="0.70" step="0.05" oninput="updateFonts()">
             
@@ -485,9 +497,10 @@
         <div class="help-text" style="margin-top: 15px; padding: 10px; background: #f0f8ff; border-radius: 4px; border-left: 3px solid #007bff;">
             <strong>Quick Start:</strong><br>
             1. Click "Preview Print" to see layout<br>
-            2. Auto-fit keeps names large and unclipped<br>
-            3. Table Scale is set to fit at 100% print zoom<br>
-            4. Click Print or press Ctrl+P
+            2. Use Horizontal/Vertical Position to center the table<br>
+            3. Auto-fit keeps names large and unclipped<br>
+            4. Table Scale controls zoom level<br>
+            5. Click Print or press Ctrl+P
         </div>
     </div>
 
@@ -576,14 +589,20 @@
         const mtb = document.getElementById('mtb').value;
         const mlr = document.getElementById('mlr').value;
         const scale = document.getElementById('scale').value;
+        const offsetX = document.getElementById('offsetx').value;
+        const offsetY = document.getElementById('offsety').value;
 
         root.style.setProperty('--margin-tb', mtb + 'px');
         root.style.setProperty('--margin-lr', mlr + 'px');
         root.style.setProperty('--table-scale', scale);
+        root.style.setProperty('--table-offset-x', offsetX + 'px');
+        root.style.setProperty('--table-offset-y', offsetY + 'px');
 
         document.getElementById('val-mtb').textContent = mtb + 'px';
         document.getElementById('val-mlr').textContent = mlr + 'px';
         document.getElementById('val-scale').textContent = Math.round(scale * 100) + '%';
+        document.getElementById('val-offsetx').textContent = offsetX + 'px';
+        document.getElementById('val-offsety').textContent = offsetY + 'px';
     }
 
     function fitToPage() {
@@ -595,6 +614,8 @@
         document.getElementById('mtb').value = 8;
         document.getElementById('mlr').value = 8;
         document.getElementById('scale').value = 0.88;
+        document.getElementById('offsetx').value = 0;
+        document.getElementById('offsety').value = 0;
         document.getElementById('autofit').checked = true;
 
         updateFonts();
