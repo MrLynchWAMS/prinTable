@@ -8,14 +8,14 @@
     :root {
         /* Default Font Sizes - Larger for readability */
         --fs-num: 0.70em;
-        --fs-sym: 1.8em;
+        --fs-sym: 1.6em;
         --fs-name: 0.75em;
         --fs-mass: 0.75em;
 
         /* Layout Variables - print-optimized defaults */
         --margin-tb: 8px;
         --margin-lr: 8px;
-        --table-scale: 0.91; /* 0.91 = 100% — prints perfectly at landscape 100% */
+        --table-scale: 0.88; /* 0.88 = 100% — prints perfectly at landscape 100% */
         --table-offset-x: 0px;
         --table-offset-y: 0px;
 
@@ -504,6 +504,8 @@
         body { 
             background-color: white !important;
             padding: var(--margin-tb) var(--margin-lr) !important;
+            overflow: hidden !important;
+            max-height: 100vh !important;
         }
         
         body.preview-mode {
@@ -517,6 +519,7 @@
             box-shadow: none !important;
             padding: 0 !important;
             margin: 0 !important;
+            overflow: hidden !important;
         }
         
         #button-container, #controls-panel { 
@@ -541,11 +544,20 @@
             overflow: visible !important;
         }
 
-        .at-num, .symbol, .name, .mass, .econfig {
-            display: block !important;
+        .at-num, .symbol, .name, .mass {
             visibility: visible !important;
             opacity: 1 !important;
             overflow: visible !important;
+        }
+
+        .show-econfig .econfig {
+            display: block !important;
+            visibility: visible !important;
+        }
+
+        .show-eneg .eneg {
+            display: block !important;
+            visibility: visible !important;
         }
 
         .name {
@@ -563,11 +575,14 @@
             transform: scale(var(--table-scale)) translateX(var(--table-offset-x)) translateY(var(--table-offset-y)) !important;
             transform-origin: top left !important;
             page-break-inside: avoid;
+            margin-bottom: 0 !important;
         }
 
         .legend-container {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
 
         .show-patterns .cat-alkali,
@@ -623,8 +638,8 @@
 
         <div class="control-group">
             <label>Table Scale (Zoom): <span class="value-display" id="val-scale">100%</span></label>
-            <input type="range" id="scale" min="0.5" max="1.2" value="0.91" step="0.01" oninput="updateLayout()">
-            <div class="help-text">100% = 0.91 raw scale — prints perfectly at landscape 100%</div>
+            <input type="range" id="scale" min="0.5" max="1.2" value="0.88" step="0.01" oninput="updateLayout()">
+            <div class="help-text">100% = 0.88 raw scale — prints perfectly at landscape 100%</div>
         </div>
 
         <div class="control-group">
@@ -640,8 +655,8 @@
             <label>Atomic Number Size: <span class="value-display" id="val-rn">0.70</span></label>
             <input type="range" id="rn" min="0.3" max="1.2" value="0.70" step="0.05" oninput="updateFonts()">
             
-            <label>Symbol Size: <span class="value-display" id="val-rs">1.80</span></label>
-            <input type="range" id="rs" min="0.8" max="3.0" value="1.8" step="0.05" oninput="updateFonts()">
+            <label>Symbol Size: <span class="value-display" id="val-rs">1.60</span></label>
+            <input type="range" id="rs" min="0.8" max="3.0" value="1.6" step="0.05" oninput="updateFonts()">
             
             <label class="checkbox-label" style="margin-top: 10px; margin-bottom: 10px;">
                 <input type="checkbox" id="autofit" checked onchange="updateTableRender()">
@@ -735,8 +750,8 @@
     // cat values: alkali, alkaline, tm, ptm, metalloid, nonmetal, noble, lan, act
     // state values: solid, liquid, gas, synthetic
 
-    // Default scale: 0.91 raw = "100%" in UI (prints perfectly at landscape 100%)
-    const DEFAULT_SCALE = 0.91;
+    // Default scale: 0.88 raw = "100%" in UI (prints perfectly at landscape 100%)
+    const DEFAULT_SCALE = 0.88;
 
     const elements = [
         {n:1,  s:"H",  name:"Hydrogen",      m:1.008,   cat:"nonmetal",  state:"gas",       eneg:2.20, econfig:"1s\u00B9",             g:"nonmetal"},
@@ -985,7 +1000,7 @@
 
     function fitToPage() {
         document.getElementById('rn').value = 0.70;
-        document.getElementById('rs').value = 1.8;
+        document.getElementById('rs').value = 1.6;
         document.getElementById('rnm').value = 0.75;
         document.getElementById('rm').value = 0.75;
         document.getElementById('maxname').value = 0.85;
